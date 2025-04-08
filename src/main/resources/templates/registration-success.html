@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Cadastro Realizado</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+<div class="container mt-5">
+    <div class="alert alert-success">
+        <h4 class="alert-heading">Cadastro realizado com sucesso!</h4>
+        <p>Um email com o código de ativação foi enviado para <strong th:text="${email}"></strong>.</p>
+        <hr>
+        <p class="mb-0">Por favor, verifique seu email e <a th:href="@{/activate(email=${email})}">ative sua conta</a>.</p>
+    </div>
+</div>
+</body>
+</html>
