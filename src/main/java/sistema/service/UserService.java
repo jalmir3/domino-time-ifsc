@@ -1,5 +1,6 @@
 package sistema.service;
 
+import jakarta.mail.MessagingException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import sistema.dto.UserRegistrationDto;
@@ -24,7 +25,7 @@ public class UserService {
         this.emailService = emailService;
     }
 
-    public User registerUser(UserRegistrationDto registrationDto) {
+    public String registerUserWithActivation(UserRegistrationDto registrationDto) throws MessagingException {
         if (!registrationDto.getPassword().equals(registrationDto.getConfirmPassword())) {
             throw new IllegalArgumentException("Senhas não coincidem");
         }
@@ -33,33 +34,37 @@ public class UserService {
             throw new IllegalArgumentException("Email já cadastrado");
         }
 
+        if (userRepository.findByNickname(registrationDto.getNickname()).isPresent()) {
+            throw new IllegalArgumentException("Apelido já cadastrado");
+        }
+
+        String activationToken = UUID.randomUUID().toString();
+
         User user = new User();
         user.setEmail(registrationDto.getEmail());
-        user.setBirthDate(registrationDto.getBirthDate());
         user.setPassword(passwordEncoder.encode(registrationDto.getPassword()));
+        user.setActivationToken(activationToken);
+        user.setBirthDate(registrationDto.getBirthDate());
+        user.setNickname(registrationDto.getNickname());
         user.setStatus(UserStatus.INACTIVE);
-        user.setActivationPin(generatePin());
 
-        User savedUser = userRepository.save(user);
+        userRepository.save(user);
 
-        emailService.sendActivationEmail(savedUser.getEmail(), savedUser.getActivationPin());
+        String activationLink = "http://localhost:8080/activate?token=" + activationToken;
+        emailService.sendActivationEmail(user.getEmail(), activationLink);
 
-        return savedUser;
+        return activationToken;
     }
 
-    public boolean activateUser(String email, String pin) {
-        return userRepository.findByEmailAndActivationPin(email, pin)
+    public boolean activateUser(String token) {
+        return userRepository.findByActivationToken(token)
                 .map(user -> {
                     user.setStatus(UserStatus.ACTIVE);
                     user.setActivatedAt(LocalDateTime.now());
-                    user.setActivationPin(null);
+                    user.setActivationToken(null);
                     userRepository.save(user);
                     return true;
                 })
                 .orElse(false);
-    }
-
-    private String generatePin() {
-        return UUID.randomUUID().toString().substring(0, 6).toUpperCase();
     }
 }

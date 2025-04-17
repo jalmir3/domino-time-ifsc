@@ -16,21 +16,27 @@ public class SecurityConfig {
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
+                                "/",
                                 "/register",
                                 "/register/**",
+                                "/activate",
                                 "/activate/**",
+                                "/registration-success",
                                 "/static/**",
-                                "/registration-success"
+                                "/login",
+                                "/favicon.ico"
                         ).permitAll()
                         .anyRequest().authenticated()
                 )
                 .formLogin(form -> form
                         .loginPage("/login")
+                        .defaultSuccessUrl("/home")
                         .permitAll()
                 );
 

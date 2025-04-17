@@ -28,6 +28,9 @@ public class User {
     @Column(name = "email", unique = true, nullable = false, length = 100)
     private String email;
 
+    @Column(name = "nickname", unique = true, nullable = false, length = 100)
+    private String nickname;
+
     @Column(name = "birth_date", nullable = false, columnDefinition = "DATE")
     private LocalDate birthDate;
 
@@ -38,8 +41,8 @@ public class User {
     @Column(name = "status", columnDefinition = "VARCHAR(20) DEFAULT 'INACTIVE'")
     private UserStatus status = UserStatus.INACTIVE;
 
-    @Column(name = "activation_pin", length = 6)
-    private String activationPin;
+    @Column(name = "activation_token", length = 50)
+    private String activationToken;
 
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false, columnDefinition = "TIMESTAMP WITH TIME ZONE")

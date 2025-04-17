@@ -4,36 +4,74 @@
     <meta charset="UTF-8">
     <title>Cadastro de Usuário</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" th:href="@{/css/style.css}">
 </head>
-<body>
-<div class="container mt-5">
-    <h2>Cadastro de Usuário</h2>
-    <form th:action="@{/register}" th:object="${user}" method="post">
-        <div class="form-group">
-            <label for="email">Email</label>
-            <input type="email" class="form-control" id="email" th:field="*{email}" required>
-            <small class="text-danger" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></small>
-        </div>
+<body class="bg-light">
+<div class="container">
+    <div class="container">
+        <h2 class="title">Cadastro de Usuário</h2>
 
-        <div class="form-group">
-            <label for="birthDate">Data de Nascimento</label>
-            <input type="date" class="form-control" id="birthDate" th:field="*{birthDate}" required>
-            <small class="text-danger" th:if="${#fields.hasErrors('birthDate')}" th:errors="*{birthDate}"></small>
-        </div>
+        <form class="form" th:action="@{/register}" th:object="${user}" method="post" id="registerForm">
 
-        <div class="form-group">
-            <label for="password">Senha</label>
-            <input type="password" class="form-control" id="password" th:field="*{password}" required>
-            <small class="text-danger" th:if="${#fields.hasErrors('password')}" th:errors="*{password}"></small>
-        </div>
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" class="form-control" id="email" th:field="*{email}" required>
+                <small class="text-danger" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></small>
+            </div>
+            <div class="form-group">
+                <label for="nickname">Apelido</label>
+                <input type="text" class="form-control" id="nickname"
+                       th:field="*{nickname}" required>
+                <small class="text-danger" th:if="${#fields.hasErrors('nickname')}"
+                       th:errors="*{nickname}"></small>
+            </div>
+            <div class="form-group">
+                <label for="birthDate">Data de Nascimento</label>
+                <input type="date" class="form-control" id="birthDate" th:field="*{birthDate}" required>
+                <small class="text-danger" th:if="${#fields.hasErrors('birthDate')}" th:errors="*{birthDate}"></small>
+            </div>
+            <div class="form-group">
+                <label for="password">Senha</label>
+                <input type="password" class="form-control" id="password" th:field="*{password}" required>
+                <small class="text-danger" th:if="${#fields.hasErrors('password')}" th:errors="*{password}"></small>
+            </div>
+            <div class="form-group">
+                <label for="confirmPassword">Confirme a Senha</label>
+                <input type="password" class="form-control" id="confirmPassword" th:field="*{confirmPassword}" required>
+            </div>
 
-        <div class="form-group">
-            <label for="confirmPassword">Confirme a Senha</label>
-            <input type="password" class="form-control" id="confirmPassword" th:field="*{confirmPassword}" required>
-        </div>
+            <button type="submit" id="submitBtn" class="btn btn-primary btn">
+                <span id="btnText">Cadastrar</span>
+            </button>
 
-        <button type="submit" class="btn btn-primary">Cadastrar</button>
-    </form>
+            <div class="footer">
+                <p>Já tem uma conta? <a th:href="@{/login}">Faça login</a></p>
+            </div>
+        </form>
+    </div>
 </div>
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script>
+    document.getElementById('registerForm').addEventListener('submit', function(e) {
+        const submitBtn = document.getElementById('submitBtn');
+        const btnText = document.getElementById('btnText');
+
+        if (!submitBtn.dataset.originalText) {
+            submitBtn.dataset.originalText = btnText.innerHTML;
+        }
+
+        submitBtn.classList.add('btn-loading');
+        submitBtn.disabled = true;
+        btnText.innerHTML = 'Processando...';
+
+        setTimeout(() => {
+            submitBtn.classList.remove('btn-loading');
+            submitBtn.disabled = false;
+            btnText.innerHTML = submitBtn.dataset.originalText;
+        }, 10000);
+    });
+</script>
 </body>
 </html>

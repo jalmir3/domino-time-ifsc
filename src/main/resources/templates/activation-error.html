@@ -2,16 +2,16 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Conta Ativada</title>
+    <title>Erro na Ativação</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
 </head>
 <body>
 <div class="container mt-5">
-    <div class="alert alert-success">
-        <h4 class="alert-heading">Conta ativada com sucesso!</h4>
-        <p>Sua conta foi ativada e agora você pode fazer login.</p>
+    <div class="alert alert-danger">
+        <h4 class="alert-heading">Erro na ativação da conta</h4>
+        <p th:text="${error}">Mensagem de erro padrão</p>
         <hr>
-        <a th:href="@{/login}" class="btn btn-success">Ir para Login</a>
+        <a th:href="@{/contact}" class="btn btn-primary">Contatar Suporte</a>
     </div>
 </div>
 </body>

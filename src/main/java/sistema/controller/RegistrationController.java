@@ -1,10 +1,12 @@
 package sistema.controller;
 
+import jakarta.mail.MessagingException;
 import jakarta.validation.Valid;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import sistema.dto.UserRegistrationDto;
 import sistema.service.UserService;
 
@@ -13,6 +15,8 @@ import sistema.service.UserService;
 public class RegistrationController {
     private final UserService userService;
 
+    private String registration = "registration";
+
     public RegistrationController(UserService userService) {
         this.userService = userService;
     }
@@ -20,27 +24,30 @@ public class RegistrationController {
     @GetMapping
     public String showRegistrationForm(Model model) {
         model.addAttribute("user", new UserRegistrationDto());
-        return "registration";
+        return registration;
     }
 
     @PostMapping
     public String registerUser(@ModelAttribute("user") @Valid UserRegistrationDto userDto,
-                               BindingResult result) {
+                               BindingResult result,
+                               RedirectAttributes redirectAttributes) {
+        String email = "email";
         if (result.hasErrors()) {
-            return "registration";
+            return registration;
         }
 
         try {
-            userService.registerUser(userDto);
-            return "redirect:/register/success?email=" + userDto.getEmail();
-        } catch (IllegalArgumentException e) {
-            result.rejectValue("email", null, e.getMessage());
-            return "registration";
+            userService.registerUserWithActivation(userDto);
+            redirectAttributes.addAttribute(email, userDto.getEmail());
+            return "redirect:/register/success";
+        } catch (MessagingException e) {
+            result.rejectValue(email, "400", "Erro ao enviar e-mail de ativação");
+            return registration;
         }
     }
 
     @GetMapping("/success")
-    public String showSuccessPage(@RequestParam String email, Model model) {
+    public String showSuccessPage(@RequestParam("email") String email, Model model) {
         model.addAttribute("email", email);
         return "registration-success";
     }

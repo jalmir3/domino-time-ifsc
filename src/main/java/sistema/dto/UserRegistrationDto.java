@@ -11,6 +11,9 @@ public class UserRegistrationDto {
     @Email(message = "Email inválido")
     private String email;
 
+    @NotBlank(message = "Apelido é obrigatório")
+    private String nickname;
+
     @NotNull(message = "Data de nascimento é obrigatória")
     @Past(message = "Data de nascimento deve ser menor que a data atual")
     @DateTimeFormat(pattern = "yyyy-MM-dd")
