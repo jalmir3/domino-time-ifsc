@@ -35,13 +35,15 @@ public class RegistrationController {
         if (result.hasErrors()) {
             return registration;
         }
-
         try {
             userService.registerUserWithActivation(userDto);
             redirectAttributes.addAttribute(email, userDto.getEmail());
             return "redirect:/register/success";
+        } catch (IllegalArgumentException e) {
+            result.reject("erro.cadastro", e.getMessage());
+            return registration;
         } catch (MessagingException e) {
-            result.rejectValue(email, "400", "Erro ao enviar e-mail de ativação");
+            result.reject("erro.email", "Erro ao enviar e-mail de ativação");
             return registration;
         }
     }

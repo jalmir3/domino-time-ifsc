@@ -1,6 +1,7 @@
 package sistema.service;
 
 import jakarta.mail.MessagingException;
+import lombok.AllArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import sistema.dto.UserRegistrationDto;
@@ -12,18 +13,11 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Service
+@AllArgsConstructor
 public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final EmailService emailService;
-
-    public UserService(UserRepository userRepository,
-                       PasswordEncoder passwordEncoder,
-                       EmailService emailService) {
-        this.userRepository = userRepository;
-        this.passwordEncoder = passwordEncoder;
-        this.emailService = emailService;
-    }
 
     public String registerUserWithActivation(UserRegistrationDto registrationDto) throws MessagingException {
         if (!registrationDto.getPassword().equals(registrationDto.getConfirmPassword())) {

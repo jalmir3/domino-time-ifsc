@@ -24,7 +24,7 @@
                        placeholder="Digite sua senha" required>
             </div>
 
-            <div th:if="${param.error}" class="alert alert-danger alert">
+            <div th:if="${param.error}" class="alert alert-danger alert" id="errorAlert">
                 Email ou senha inválidos
             </div>
 
@@ -59,6 +59,15 @@
             submitBtn.disabled = false;
             btnText.innerHTML = submitBtn.dataset.originalText;
         }, 10000);
+    });
+    document.addEventListener('DOMContentLoaded', function () {
+        const errorAlert = document.getElementById('errorAlert');
+        if (errorAlert) {
+            setTimeout(() => {
+                errorAlert.classList.add('fade');
+                setTimeout(() => errorAlert.remove(), 500);
+            }, 2500);
+        }
     });
 </script>
 </body>
