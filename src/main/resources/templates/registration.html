@@ -4,47 +4,53 @@
     <meta charset="UTF-8">
     <title>Cadastro de Usuário</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link rel="stylesheet" th:href="@{/style.css}">
 </head>
 <body class="bg-light">
-<div class="container">
-    <div class="container">
-        <h2 class="title">Cadastro de Usuário</h2>
-
-        <form class="form" th:action="@{/register}" th:object="${user}" method="post" id="registerForm">
-            <div class="form-group">
-                <label for="email">Email</label>
-                <input type="email" class="form-control" id="email" th:field="*{email}" required>
-            </div>
-            <div class="form-group">
-                <label for="nickname">Apelido</label>
-                <input type="text" class="form-control" id="nickname" th:field="*{nickname}" required>
-            </div>
-            <div class="form-group">
-                <label for="birthDate">Data de Nascimento</label>
-                <input type="date" class="form-control" id="birthDate" th:field="*{birthDate}" required>
-            </div>
-            <div class="form-group">
-                <label for="password">Senha</label>
-                <input type="password" class="form-control" id="password" th:field="*{password}" required>
-            </div>
-            <div class="form-group">
-                <label for="confirmPassword">Confirme a Senha</label>
-                <input type="password" class="form-control" id="confirmPassword" th:field="*{confirmPassword}" required>
-            </div>
-            <div class="alert alert-danger" id="errorAlert"
-                 th:if="${#fields.hasGlobalErrors()}"
-                 th:each="err : ${#fields.globalErrors()}"
-                 th:text="${err}">
-            </div>
-            <button type="submit" id="submitBtn" class="btn btn-primary btn">
-                <span id="btnText">Cadastrar</span>
-            </button>
-            <div class="footer">
-                <p>Já tem uma conta? <a th:href="@{/login}">Faça login</a></p>
-            </div>
-        </form>
+<div class="header">
+    <div class="logo">
+        <img th:onclick="|window.location.href='@{/home}'|" th:src="@{/images/logo.png}" alt="Logo" class="logo-img">
     </div>
+</div>
+<div class="container">
+    <h2 class="title">Crie a sua conta</h2>
+
+    <form class="form" th:action="@{/register}" th:object="${user}" method="post" id="registerForm">
+        <div class="form-group">
+            <label for="email">Email</label>
+            <input type="email" class="form-control" id="email" th:field="*{email}" placeholder="Digite seu email" required>
+        </div>
+        <div class="form-group">
+            <label for="nickname">Apelido</label>
+            <input type="text" class="form-control" id="nickname" th:field="*{nickname}" placeholder="Digite um apelido" required>
+        </div>
+        <div class="form-group">
+            <label for="birthDate">Data de Nascimento</label>
+            <input type="date" class="form-control" id="birthDate" th:field="*{birthDate}" required>
+        </div>
+        <div class="form-group">
+            <label for="password">Senha</label>
+            <input type="password" class="form-control" id="password" th:field="*{password}" placeholder="Digite uma senha" required>
+        </div>
+        <div class="form-group">
+            <label for="confirmPassword">Confirme a Senha</label>
+            <input type="password" class="form-control" id="confirmPassword" th:field="*{confirmPassword}" placeholder="Confirme a senha" required>
+        </div>
+        <div class="alert alert-danger" id="errorAlert"
+             th:if="${#fields.hasGlobalErrors()}"
+             th:each="err : ${#fields.globalErrors()}"
+             th:text="${err}">
+        </div>
+        <button type="submit" id="submitBtn" class="btn btn-primary btn">
+            <span id="btnText">Cadastrar</span>
+        </button>
+        <div class="footer">
+            <p>Já tem uma conta? <a th:href="@{/login}">Faça login</a></p>
+        </div>
+    </form>
+</div>
+<div class="footer-bar">
+    Uma maneira fácil de usar para marcar sua pontuação do jogo de dominó em qualquer hora e lugar
 </div>
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>

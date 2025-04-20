@@ -49,4 +49,8 @@ public class CustomUserDetails implements UserDetails {
     public boolean isEnabled() {
         return user.getStatus() == UserStatus.ACTIVE;
     }
+
+    public String getNickname() {
+        return user.getNickname();
+    }
 }

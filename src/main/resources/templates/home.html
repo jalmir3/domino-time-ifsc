@@ -4,18 +4,39 @@
 <head>
     <meta charset="UTF-8">
     <title>Home</title>
+    <link rel="stylesheet" th:href="@{/style.css}">
 </head>
 <body>
-<div class="container">
-    <h1>Bem-vindo, <span sec:authentication="name"></span>!</h1>
-
-    <div sec:authorize="hasRole('USER')">
-        <p>Conteúdo exclusivo para usuários logados</p>
+<div class="header">
+    <div class="logo">
+        <img th:onclick="|window.location.href='@{/home}'|" th:src="@{/images/logo.png}" alt="Logo" class="logo-img">
     </div>
-
-    <form th:action="@{/logout}" method="post">
-        <button type="submit" class="btn btn-danger">Sair</button>
-    </form>
+    <div class="buttons">
+        <div sec:authorize="!isAuthenticated()">
+            <a class="form-group" th:onclick="|window.location.href='@{/login}'|">Entrar</a>
+            <div class="separator"></div>
+            <button class="button" th:onclick="|window.location.href='@{/register}'|">Cadastre-se</button>
+        </div>
+        <div sec:authorize="isAuthenticated()">
+            <span class="form-group" th:text="${#authentication.principal.nickname}"></span>
+            <div class="separator"></div>
+            <form th:action="@{/logout}" method="post" style="display:inline;">
+                <button class="button">Logout</button>
+            </form>
+        </div>
+    </div>
+</div>
+<div class="domino-line">
+    <img th:src="@{/images/img.png}" alt="Linha de dominós">
+</div>
+<div class="content">
+    <div class="left-box">
+        <div class="title">QUER JOGAR DOMINÓ?</div>
+        <div class="subtitle">Marque sua partida agora e entre no jogo!</div>
+    </div>
+</div>
+<div class="footer-bar">
+    Uma maneira fácil de usar para marcar sua pontuação do jogo de dominó em qualquer hora e lugar
 </div>
 </body>
 </html>

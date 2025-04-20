@@ -45,6 +45,8 @@ public class SecurityConfig {
                                 "/activate/**",
                                 "/registration-success",
                                 "/static/**",
+                                "/images/**",
+                                "/style.css",
                                 "/login",
                                 "/favicon.ico",
                                 "/home"
@@ -57,7 +59,8 @@ public class SecurityConfig {
                         .permitAll()
                 )
                 .logout(logout -> logout
-                        .logoutSuccessUrl("/login?logout")
+                        .logoutUrl("/logout")
+                        .logoutSuccessUrl("/home")
                         .permitAll()
                 );
 
