@@ -41,6 +41,12 @@
              th:each="err : ${#fields.globalErrors()}"
              th:text="${err}">
         </div>
+        <div class="alert alert-success" th:if="${cadastroSucesso}" id="successAlert">
+            <h4 class="alert-heading">Cadastro realizado com sucesso!</h4>
+            <p>Um email com o link de ativação foi enviado para <strong th:text="${email}"></strong>.</p>
+            <hr>
+            <p class="mb-0">Por favor, verifique seu email e ative sua conta.</p>
+        </div>
         <button type="submit" id="submitBtn" class="btn btn-primary btn">
             <span id="btnText">Cadastrar</span>
         </button>
@@ -81,6 +87,15 @@
                 errorAlert.classList.add('fade');
                 setTimeout(() => errorAlert.remove(), 500);
             }, 2500);
+        }
+    });
+    document.addEventListener('DOMContentLoaded', function () {
+        const errorAlert = document.getElementById('successAlert');
+        if (successAlert) {
+            setTimeout(() => {
+                errorAlert.classList.add('fade');
+                setTimeout(() => successAlert.remove(), 500);
+            }, 5000);
         }
     });
 </script>

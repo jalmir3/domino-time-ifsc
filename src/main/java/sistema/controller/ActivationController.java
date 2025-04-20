@@ -22,10 +22,12 @@ public class ActivationController {
         boolean activated = userService.activateUser(token);
 
         if (activated) {
-            return "activation-success";
+            model.addAttribute("ativacaoSucesso", true);
+            return "login";
         } else {
+            model.addAttribute("ativacaoErro", true);
             model.addAttribute("error", "Token de ativação inválido ou expirado");
-            return "activation-error";
+            return "login";
         }
     }
 

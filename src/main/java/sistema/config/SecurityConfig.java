@@ -43,7 +43,6 @@ public class SecurityConfig {
                                 "/register/**",
                                 "/activate",
                                 "/activate/**",
-                                "/registration-success",
                                 "/static/**",
                                 "/images/**",
                                 "/style.css",

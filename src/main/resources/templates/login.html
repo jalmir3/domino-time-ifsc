@@ -32,6 +32,15 @@
         <div th:if="${param.error}" class="alert alert-danger alert" id="errorAlert">
             Email ou senha inválidos
         </div>
+        <div class="alert alert-success" th:if="${ativacaoSucesso}" id="successAlert">
+            <h4 class="alert-heading">Conta ativada com sucesso!</h4>
+            <p>Sua conta foi ativada e agora você pode fazer login.</p>
+        </div>
+        <div class="alert alert-danger" th:if="${ativacaoErro}" id="activationErrorAlert">
+            <h4 class="alert-heading">Erro na ativação da conta</h4>
+            <p th:text="${error}"></p>
+            <hr>
+        </div>
 
         <button type="submit" id="submitBtn" class="btn btn-primary btn">
             <span id="btnText">Entrar</span>
@@ -75,6 +84,24 @@
                 errorAlert.classList.add('fade');
                 setTimeout(() => errorAlert.remove(), 500);
             }, 2500);
+        }
+    });
+    document.addEventListener('DOMContentLoaded', function () {
+        const success = document.getElementById('successAlert');
+        if (success) {
+            setTimeout(() => {
+                success.classList.add('fade');
+                setTimeout(() => success.remove(), 500);
+            }, 4000);
+        }
+    });
+    document.addEventListener('DOMContentLoaded', function () {
+        const errorAlert = document.getElementById('activationErrorAlert');
+        if (errorAlert) {
+            setTimeout(() => {
+                errorAlert.classList.add('fade');
+                setTimeout(() => errorAlert.remove(), 500);
+            }, 4000);
         }
     });
 </script>

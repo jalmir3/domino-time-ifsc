@@ -5,8 +5,10 @@ import jakarta.validation.Valid;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import sistema.dto.UserRegistrationDto;
 import sistema.service.UserService;
 
@@ -30,15 +32,15 @@ public class RegistrationController {
     @PostMapping
     public String registerUser(@ModelAttribute("user") @Valid UserRegistrationDto userDto,
                                BindingResult result,
-                               RedirectAttributes redirectAttributes) {
-        String email = "email";
+                               Model model) {
         if (result.hasErrors()) {
             return registration;
         }
         try {
             userService.registerUserWithActivation(userDto);
-            redirectAttributes.addAttribute(email, userDto.getEmail());
-            return "redirect:/register/success";
+            model.addAttribute("cadastroSucesso", true);
+            model.addAttribute("email", userDto.getEmail());
+            return registration;
         } catch (IllegalArgumentException e) {
             result.reject("erro.cadastro", e.getMessage());
             return registration;
@@ -46,11 +48,5 @@ public class RegistrationController {
             result.reject("erro.email", "Erro ao enviar e-mail de ativação");
             return registration;
         }
-    }
-
-    @GetMapping("/success")
-    public String showSuccessPage(@RequestParam("email") String email, Model model) {
-        model.addAttribute("email", email);
-        return "registration-success";
     }
 }
