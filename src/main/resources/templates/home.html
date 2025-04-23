@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8" name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home</title>
+    <link rel="stylesheet" th:href="@{/style.css}">
+</head>
+<body>
+<div class="header">
+    <div class="logo">
+        <img th:onclick="|window.location.href='@{/home}'|" th:src="@{/images/logo.png}" alt="Logo" class="logo-img">
+    </div>
+    <div class="buttons">
+        <div sec:authorize="!isAuthenticated()">
+            <a class="form-group" th:onclick="|window.location.href='@{/login}'|">Entrar</a>
+            <div class="separator"></div>
+            <button class="button" th:onclick="|window.location.href='@{/register}'|">Cadastre-se</button>
+        </div>
+        <div sec:authorize="isAuthenticated()">
+            <span class="form-group" th:text="${#authentication.principal.nickname}"></span>
+            <div class="separator"></div>
+            <form th:action="@{/logout}" method="post" style="display:inline;">
+                <button class="button">Logout</button>
+            </form>
+        </div>
+    </div>
+</div>
+<div class="domino-line">
+    <img src="/images/img-mobile.png" alt="domino-mobile" class="img-mobile">
+    <img src="/images/img-desktop.png" alt="domino-desktop" class="img-desktop">
+</div>
+<div class="content">
+    <div class="left-box">
+        <div class="title">QUER JOGAR DOMINÓ?</div>
+        <div class="subtitle">Marque sua partida agora e entre no jogo!</div>
+    </div>
+</div>
+<div class="footer-bar">
+    Uma maneira fácil de usar para marcar sua pontuação do jogo de dominó em qualquer hora e lugar
+</div>
+</body>
+</html>
