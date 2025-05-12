@@ -61,4 +61,33 @@ public class UserService {
                 })
                 .orElse(false);
     }
+
+    public String createPasswordResetToken(String email) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new IllegalArgumentException("Email não cadastrado"));
+
+        String token = UUID.randomUUID().toString();
+        user.setPasswordResetToken(token);
+        user.setPasswordResetExpiry(LocalDateTime.now().plusHours(24));
+        userRepository.save(user);
+
+        return token;
+    }
+
+    public boolean isPasswordResetTokenValid(String token) {
+        return userRepository.findByPasswordResetToken(token)
+                .map(user -> user.getPasswordResetExpiry().isAfter(LocalDateTime.now()))
+                .orElse(false);
+    }
+
+    public void resetPassword(String token, String newPassword) {
+        User user = userRepository.findByPasswordResetToken(token)
+                .filter(u -> u.getPasswordResetExpiry().isAfter(LocalDateTime.now()))
+                .orElseThrow(() -> new IllegalArgumentException("Token inválido ou expirado"));
+
+        user.setPassword(passwordEncoder.encode(newPassword));
+        user.setPasswordResetToken(null);
+        user.setPasswordResetExpiry(null);
+        userRepository.save(user);
+    }
 }
