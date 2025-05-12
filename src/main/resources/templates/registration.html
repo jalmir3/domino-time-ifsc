@@ -90,10 +90,10 @@
         }
     });
     document.addEventListener('DOMContentLoaded', function () {
-        const errorAlert = document.getElementById('successAlert');
+        const successAlert = document.getElementById('successAlert');
         if (successAlert) {
             setTimeout(() => {
-                errorAlert.classList.add('fade');
+                successAlert.classList.add('fade');
                 setTimeout(() => successAlert.remove(), 500);
             }, 5000);
         }

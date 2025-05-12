@@ -48,7 +48,11 @@ public class SecurityConfig {
                                 "/style.css",
                                 "/login",
                                 "/favicon.ico",
-                                "/home"
+                                "/home",
+                                "/forgot-password",
+                                "/forgot-password/**",
+                                "/reset-password",
+                                "/reset-password/**"
                         ).permitAll()
                         .anyRequest().authenticated()
                 )
