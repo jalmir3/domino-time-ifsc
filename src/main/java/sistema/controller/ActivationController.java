@@ -1,5 +1,6 @@
 package sistema.controller;
 
+import lombok.Data;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -8,14 +9,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 import sistema.service.UserService;
 
 @Controller
+@Data
 @RequestMapping("/activate")
 public class ActivationController {
+
     private final UserService userService;
-
-    public ActivationController(UserService userService) {
-        this.userService = userService;
-    }
-
 
     @GetMapping
     public String activateAccount(@RequestParam("token") String token, Model model) {

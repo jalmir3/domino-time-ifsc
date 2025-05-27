@@ -50,6 +50,12 @@ public class User {
 
     @Column(name = "activated_at", columnDefinition = "TIMESTAMP WITH TIME ZONE")
     private LocalDateTime activatedAt;
+
+    @Column(name = "password_reset_token")
+    private String passwordResetToken;
+
+    @Column(name = "password_reset_expiry")
+    private LocalDateTime passwordResetExpiry;
 }
 
 
