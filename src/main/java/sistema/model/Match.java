@@ -16,7 +16,7 @@ public class Match {
     @GeneratedValue(generator = "UUID")
     @GenericGenerator(
             name = "UUID",
-            type = org.hibernate.id.uuid.UuidGenerator.class  // Tipo explícito
+            type = org.hibernate.id.uuid.UuidGenerator.class
     )
     @Column(name = "id", updatable = false, nullable = false, columnDefinition = "UUID")
     private UUID id;
