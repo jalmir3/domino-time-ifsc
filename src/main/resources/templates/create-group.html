@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8" name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Criar Grupo</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" th:href="@{/style.css}">
+</head>
+<body>
+<div class="header">
+    <div class="logo">
+        <img th:onclick="|window.location.href='@{/home}'|" th:src="@{/images/logo.png}" alt="Logo" class="logo-img">
+    </div>
+    <div class="buttons">
+        <div sec:authorize="isAuthenticated()">
+            <span class="form-group" th:text="${#authentication.principal.nickname}"></span>
+            <div class="separator"></div>
+            <form th:action="@{/logout}" method="post" style="display:inline;">
+                <button class="button">Logout</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="form-container">
+        <h2 class="title">Criar grupo</h2>
+
+        <form th:action="@{/groups}" method="post" class="form">
+            <div class="form-group">
+                <label for="groupName">Nome do Grupo</label>
+                <input type="text" id="groupName" name="name" class="form-control"
+                       placeholder="Ex: Turma do Domino" required>
+            </div>
+
+            <div class="form-group">
+                <label>Privacidade</label>
+                <div class="radio-group" style="display: flex;">
+                    <input type="radio" id="public" name="groupType" value="PUBLIC" checked>
+                    <label for="public">Público (qualquer um pode entrar com o código)</label>
+                </div>
+                <div class="radio-group" style="display: flex;">
+                    <input type="radio" id="private" name="groupType" value="PRIVATE">
+                    <label for="private">Privado (somente com convite)</label>
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn">Criar grupo</button>
+        </form>
+</div>
+
+<div class="footer-bar">
+    Convide seus amigos e comece a marcar suas partidas de dominó agora mesmo!
+</div>
+</body>
+</html>
