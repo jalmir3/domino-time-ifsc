@@ -14,10 +14,7 @@ import java.util.UUID;
 public class GameGroup {
     @Id
     @GeneratedValue(generator = "UUID")
-    @GenericGenerator(
-            name = "UUID",
-            type = org.hibernate.id.uuid.UuidGenerator.class
-    )
+    @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
     @Column(name = "id", updatable = false, nullable = false, columnDefinition = "UUID")
     private UUID id;
 
@@ -33,5 +30,5 @@ public class GameGroup {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "privacy", columnDefinition = "VARCHAR(20) DEFAULT 'PUBLIC'")
-    private GroupType privacy = GroupType.PUBLIC;
+    private GroupType privacy;
 }
