@@ -10,6 +10,7 @@ import sistema.model.UserStatus;
 import sistema.repository.UserRepository;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -89,5 +90,9 @@ public class UserService {
         user.setPasswordResetToken(null);
         user.setPasswordResetExpiry(null);
         userRepository.save(user);
+    }
+
+    public Optional<User> findByEmail(String email) {
+        return userRepository.findByEmail(email);
     }
 }

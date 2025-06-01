@@ -4,6 +4,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import sistema.model.User;
 
 import java.util.Optional;
+import java.util.UUID;
 
 public interface UserRepository extends JpaRepository<User, Long> {
     Optional<User> findByEmail(String email);
@@ -13,4 +14,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
     Optional<User> findByActivationToken(String activationToken);
 
     Optional<User> findByPasswordResetToken(String passwordResetToken);
+
+    Optional<User> findById(UUID id);
 }
