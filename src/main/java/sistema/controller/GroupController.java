@@ -10,9 +10,11 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import sistema.model.GameGroup;
 import sistema.model.GroupType;
+import sistema.model.Match;
 import sistema.model.User;
 import sistema.service.*;
 
+import java.nio.file.AccessDeniedException;
 import java.util.UUID;
 
 @Controller
@@ -48,40 +50,43 @@ public class GroupController {
 
     @GetMapping("/{accessCode}")
     public String viewGroup(
-            @PathVariable("accessCode") String accessCode,  // Nome explícito do parâmetro
-            Model model,
-            @AuthenticationPrincipal UserDetails userDetails) {
+            @PathVariable("accessCode") String accessCode,
+            @AuthenticationPrincipal UserDetails userDetails,
+            Model model) {
+
+        User currentUser = userService.findByEmail(userDetails.getUsername())
+                .orElseThrow(() -> new UsernameNotFoundException("Usuário não encontrado"));
 
         GameGroup group = groupService.findByAccessCode(accessCode);
+        boolean isCreator = group.getCreatedBy().getId().equals(currentUser.getId());
 
         model.addAttribute("group", group);
+        model.addAttribute("isCreator", isCreator);
+        model.addAttribute("players", gameGroupService.getPlayersInGroup(group.getId()));
+        model.addAttribute("activeMatches", gameGroupService.getActiveMatches(group.getId()));
+
         return "access-code";
     }
 
-    @PostMapping("/join")
-    public String joinGroup(
-            @AuthenticationPrincipal UserDetails userDetails,
-            @RequestParam String accessCode
-    ) {
-        User user = userService.findByEmail(userDetails.getUsername())
-                .orElseThrow(() -> new UsernameNotFoundException("Usuário não encontrado"));
-
-        groupService.addPlayerToGroup(user, accessCode);
-        return "redirect:/groups/" + accessCode;
-    }
-
-    @PostMapping("/{groupCode}/matches")
+    @PostMapping("/{accessCode}/start-match")
     public String startMatch(
-            @PathVariable String groupCode,
-            @AuthenticationPrincipal UserDetails userDetails
-    ) {
-        User user = userService.findByEmail(userDetails.getUsername())
+            @PathVariable("accessCode") String accessCode,
+            @AuthenticationPrincipal UserDetails userDetails,
+            RedirectAttributes redirectAttributes) throws AccessDeniedException {
+
+        User creator = userService.findByEmail(userDetails.getUsername())
                 .orElseThrow(() -> new UsernameNotFoundException("Usuário não encontrado"));
 
-        GameGroup group = groupService.findByAccessCode(groupCode);
+        GameGroup group = groupService.findByAccessCode(accessCode);
 
-        matchService.startMatch(group.getId(), user);
-        return "redirect:/groups/" + groupCode;
+        if (!group.getCreatedBy().getId().equals(creator.getId())) {
+            throw new AccessDeniedException("Apenas o criador pode iniciar partidas");
+        }
+
+        Match newMatch = matchService.startNewMatch(group,creator);
+        redirectAttributes.addFlashAttribute("success", "Partida iniciada com sucesso!");
+
+        return "redirect:/matches/" + newMatch.getId() + "/score";
     }
 
     @PostMapping("/matches/{matchId}/scores")
@@ -94,5 +99,4 @@ public class GroupController {
         playerScoreService.registerScore(matchId, userId, score, isWinner);
         return "redirect:/matches/" + matchId;
     }
-
 }

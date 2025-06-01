@@ -33,10 +33,13 @@
 
         <div th:if="${success}" class="alert alert-success" th:text="${success}" id="successAlert"></div>
 
-        <button class="btn btn-primary btn">
-            Iniciar Nova Partida
-        </button>
-    </div>
+        <div th:if="${isCreator}" class="actions">
+            <form th:action="@{'/groups/' + ${group.accessCode} + '/start-match'}" method="post">
+                <button type="submit" class="btn btn-primary btn">
+                    Iniciar Nova Partida
+                </button>
+            </form>
+        </div>
 </div>
 
 <div class="footer-bar">
