@@ -5,7 +5,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import sistema.model.*;
-import sistema.repository.GameGroupRepository;
 import sistema.repository.MatchRepository;
 import sistema.repository.PlayerScoreRepository;
 import sistema.repository.UserRepository;
@@ -19,7 +18,6 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class MatchService {
     private final MatchRepository matchRepository;
-    private final GameGroupRepository groupRepository;
     private final PlayerScoreRepository playerScoreRepository;
     private final UserRepository userRepository;
 

@@ -29,7 +29,7 @@ public class GroupController {
     private final PlayerScoreService playerScoreService;
 
     @GetMapping("/create")
-    public String showCreateForm(Model model) {
+    public String showCreateForm() {
         return "create-group";
     }
 
