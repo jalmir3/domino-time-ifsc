@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.w3.org/1999/xhtml"
-      xmlns:tr="http://www.w3.org/1999/xhtml">
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.w3.org/1999/xhtml" xmlns:tr="http://www.w3.org/1999/xhtml">
 <head>
     <meta charset="UTF-8" name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Partida</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" th:href="@{/style.css}">
 </head>
 <body>
@@ -13,12 +13,23 @@
         <img th:onclick="|window.location.href='@{/home}'|" th:src="@{/images/logo.png}" alt="Logo" class="logo-img">
     </div>
     <div class="buttons">
-        <div sec:authorize="isAuthenticated()">
-            <span class="form-group" th:text="${#authentication.principal.nickname}"></span>
+        <div sec:authorize="!isAuthenticated()">
+            <a class="form-group" th:onclick="|window.location.href='@{/login}'|">Entrar</a>
             <div class="separator"></div>
-            <form th:action="@{/logout}" method="post" style="display:inline;">
-                <button class="button">Logout</button>
-            </form>
+            <button class="button" th:onclick="|window.location.href='@{/register}'|">Cadastre-se</button>
+        </div>
+        <div sec:authorize="isAuthenticated()" class="user-dropdown">
+            <i class="fas fa-user-circle user-icon"></i>
+            <div class="dropdown-content">
+                <div class="user-name" th:text="${#authentication.principal.nickname}"></div>
+                <a th:href="@{/account}">Gerenciar conta</a>
+                <a th:href="@{/groups/create}">Criar partida</a>
+                <a th:href="@{/groups/join}">Acessar partida</a>
+                <a th:href="@{/profile/scores}">Minhas partidas</a>
+                <form class="logout-form" th:action="@{/logout}" method="post">
+                    <button type="submit" class="btn-exit">Sair</button>
+                </form>
+            </div>
         </div>
     </div>
 </div>
@@ -33,28 +44,63 @@
             <tr class="score-header-row">
                 <th class="score-header">Jogador</th>
                 <th class="score-header">Pontuação</th>
-                <th class="score-header">Vencedor</th>
             </tr>
             </thead>
             <tbody>
-            <tr class="score-row" th:each="player : ${players}">
+            <tr class="score-row" th:each="player, stat : ${players}">
                 <td class="score-cell" th:text="${player.nickname}"></td>
                 <td class="score-cell">
-                    <input type="number" class="score-input" name="scores" min="0" value="0" required>
-                    <input type="hidden" name="playerIds" th:value="${player.id}">
-                </td>
-                <td class="score-cell winner-cell">
-                    <input type="checkbox" class="winner-checkbox" name="winners" th:value="${player.id}">
+                    <input class="score-input" type="number"
+                           name="scores[]"
+                           th:value="0" min="0" required>
+                    <input type="hidden"
+                           name="playerIds[]"
+                           th:value="${player.id}">
                 </td>
             </tr>
-            </tbody>
         </table>
         <button type="submit" class="btn btn-primary btn">Salvar Pontuações</button>
     </form>
+    <form th:action="@{'/matches/' + ${match.id} + '/cancel'}" method="post" class="cancel-form">
+        <button type="submit" class="btn-cancel btn-danger btn-cancel" onclick="return confirm('Tem certeza que deseja cancelar esta partida?')">
+            Cancelar Partida
+        </button>
+    </form>
 </div>
-
 <div class="footer-bar">
     Convide seus amigos e comece a marcar suas partidas de dominó agora mesmo!
 </div>
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+
+    const userIcons = document.querySelectorAll('.user-icon');
+    const dropdownContents = document.querySelectorAll('.dropdown-content');
+
+    userIcons.forEach(icon => {
+        icon.addEventListener('click', function(e) {
+            e.stopPropagation();
+            const dropdown = this.closest('.user-dropdown');
+            const content = dropdown.querySelector('.dropdown-content');
+
+            dropdownContents.forEach(dc => {
+                if (dc !== content) {
+                    dc.style.display = 'none';
+                }
+            });
+            content.style.display = content.style.display === 'block' ? 'none' : 'block';
+        });
+    });
+    document.addEventListener('click', function(e) {
+        if (!e.target.closest('.user-dropdown')) {
+            dropdownContents.forEach(content => {
+                content.style.display = 'none';
+            });
+        }
+    });
+});
+</script>
 </body>
 </html>

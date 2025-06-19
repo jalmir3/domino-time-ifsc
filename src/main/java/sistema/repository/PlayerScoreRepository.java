@@ -13,5 +13,6 @@ public interface PlayerScoreRepository extends JpaRepository<PlayerScore, UUID> 
     @Query("SELECT ps.user, SUM(ps.score) as totalScore FROM PlayerScore ps GROUP BY ps.user ORDER BY totalScore DESC limit 10")
     List<Object[]> findTopPlayers(Pageable pageable);
     void deleteByMatch(Match match);
+    long countByMatchId(UUID matchId);
 }
 

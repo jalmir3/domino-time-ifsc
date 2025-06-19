@@ -3,7 +3,7 @@
       xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="UTF-8" name="viewport" content="width=device-width, initial-scale=1.0">
-    <title th:text="${group.name}"></title>
+    <title>Criar Grupo</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" th:href="@{/style.css}">
@@ -36,24 +36,20 @@
 </div>
 
 <div class="form-container">
-    <h2 class="title" th:text="${group.name}"></h2>
-
-    <div class="form-group">
-        <p>Código de acesso: <strong th:text="${group.accessCode}"></strong></p>
-        <p th:if="${#strings.equals(group.privacy, 'PUBLIC')}">(Grupo Público)</p>
-        <p th:unless="${#strings.equals(group.privacy, 'PUBLIC')}">(Grupo Privado)</p>
-
-        <div th:if="${success}" class="alert alert-success" th:text="${success}" id="successAlert"></div>
-
-        <div th:if="${isCreator}" class="actions">
-            <form th:action="@{'/groups/' + ${group.accessCode} + '/start-match'}" method="post">
-                <button type="submit" class="btn btn-primary btn">
-                    Iniciar Nova Partida
-                </button>
-            </form>
+    <h1 class="title">Entrar na Partida</h1>
+    <form class="form" th:action="@{/groups/join}" id="joinGameForm" method="post">
+        <div class="form-group">
+            <label>Código da partida:</label>
+            <input type="text" class="form-control" name="accessCode"
+                   th:value="${accessCode != null} ? ${accessCode} : ''"
+                   required>
         </div>
+        <div th:if="${error}" class="alert alert-danger" id="errorAlert">
+            <span th:text="${error}"></span>
+        </div>
+        <button type="submit" class="btn btn-primary btn" id="submitBtn">Entrar</button>
+    </form>
 </div>
-
 <div class="footer-bar">
     Convide seus amigos e comece a marcar suas partidas de dominó agora mesmo!
 </div>
@@ -61,16 +57,31 @@
 <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-       const successAlert = document.getElementById('successAlert');
-        if (successAlert) {
-            setTimeout(() => {
-                successAlert.classList.add('fade');
-                setTimeout(() => successAlert.remove(), 500);
-            }, 5000);
-        }
-    });
-    document.addEventListener('DOMContentLoaded', function() {
+document.getElementById('joinGameForm').addEventListener('submit', function(e) {
+    const submitBtn = document.getElementById('submitBtn');
+    const btnText = document.getElementById('btnText');
+    const btnLoader = document.getElementById('btnLoader');
+
+    btnText.textContent = 'Processando...';
+    btnLoader.classList.remove('d-none');
+    submitBtn.disabled = true;
+
+    setTimeout(() => {
+        btnText.textContent = 'Entrar';
+        btnLoader.classList.add('d-none');
+        submitBtn.disabled = false;
+    }, 10000);
+});
+document.addEventListener('DOMContentLoaded', function() {
+    const errorAlert = document.getElementById('errorAlert');
+    if (errorAlert) {
+        setTimeout(() => {
+            errorAlert.classList.add('fade');
+            setTimeout(() => errorAlert.remove(), 500);
+        }, 3000);
+    }
+});
+document.addEventListener('DOMContentLoaded', function() {
 
     const userIcons = document.querySelectorAll('.user-icon');
     const dropdownContents = document.querySelectorAll('.dropdown-content');

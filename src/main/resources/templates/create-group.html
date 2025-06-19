@@ -5,6 +5,7 @@
     <meta charset="UTF-8" name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Criar Grupo</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" th:href="@{/style.css}">
 </head>
 <body>
@@ -13,18 +14,29 @@
         <img th:onclick="|window.location.href='@{/home}'|" th:src="@{/images/logo.png}" alt="Logo" class="logo-img">
     </div>
     <div class="buttons">
-        <div sec:authorize="isAuthenticated()">
-            <span class="form-group" th:text="${#authentication.principal.nickname}"></span>
+        <div sec:authorize="!isAuthenticated()">
+            <a class="form-group" th:onclick="|window.location.href='@{/login}'|">Entrar</a>
             <div class="separator"></div>
-            <form th:action="@{/logout}" method="post" style="display:inline;">
-                <button class="button">Logout</button>
-            </form>
+            <button class="button" th:onclick="|window.location.href='@{/register}'|">Cadastre-se</button>
+        </div>
+        <div sec:authorize="isAuthenticated()" class="user-dropdown">
+            <i class="fas fa-user-circle user-icon"></i>
+            <div class="dropdown-content">
+                <div class="user-name" th:text="${#authentication.principal.nickname}"></div>
+                <a th:href="@{/account}">Gerenciar conta</a>
+                <a th:href="@{/groups/create}">Criar partida</a>
+                <a th:href="@{/groups/join}">Acessar partida</a>
+                <a th:href="@{/profile/scores}">Minhas partidas</a>
+                <form class="logout-form" th:action="@{/logout}" method="post">
+                    <button type="submit" class="btn-exit">Sair</button>
+                </form>
+            </div>
         </div>
     </div>
 </div>
 
 <div class="form-container">
-        <h2 class="title">Criar grupo</h2>
+        <h2 class="title">Criar partida</h2>
 
         <form th:action="@{/groups}" method="post" class="form">
             <div class="form-group">
@@ -52,5 +64,37 @@
 <div class="footer-bar">
     Convide seus amigos e comece a marcar suas partidas de dominó agora mesmo!
 </div>
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+
+    const userIcons = document.querySelectorAll('.user-icon');
+    const dropdownContents = document.querySelectorAll('.dropdown-content');
+
+    userIcons.forEach(icon => {
+        icon.addEventListener('click', function(e) {
+            e.stopPropagation();
+            const dropdown = this.closest('.user-dropdown');
+            const content = dropdown.querySelector('.dropdown-content');
+
+            dropdownContents.forEach(dc => {
+                if (dc !== content) {
+                    dc.style.display = 'none';
+                }
+            });
+            content.style.display = content.style.display === 'block' ? 'none' : 'block';
+        });
+    });
+    document.addEventListener('click', function(e) {
+        if (!e.target.closest('.user-dropdown')) {
+            dropdownContents.forEach(content => {
+                content.style.display = 'none';
+            });
+        }
+    });
+});
+</script>
 </body>
 </html>

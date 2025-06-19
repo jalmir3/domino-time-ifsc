@@ -2,6 +2,7 @@ package sistema.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.webjars.NotFoundException;
 import sistema.model.*;
 import sistema.repository.*;
 
@@ -16,6 +17,7 @@ public class GameGroupService {
     private final GameGroupRepository groupRepository;
     private final GroupPlayerRepository groupPlayerRepository;
     private final MatchRepository matchRepository;
+    private final UserRepository userRepository;
 
     public GameGroup createGroup(User creator, String groupName, GroupType groupType) {
         GameGroup group = new GameGroup();
@@ -50,5 +52,28 @@ public class GameGroupService {
         return groupPlayerRepository.findByGroupId(groupId).stream()
                 .map(GroupPlayer::getUser)
                 .collect(Collectors.toList());
+    }
+
+    public void addPlayerToGroup(UUID userId, String accessCode) {
+        GameGroup group = groupRepository.findByAccessCode(accessCode)
+                .orElseThrow(() -> new NotFoundException("Partida não encontrada"));
+
+        boolean hasActiveMatch = !matchRepository.findByGroupIdAndStatus(group.getId(), MatchStatus.IN_PROGRESS).isEmpty();
+
+        if (!hasActiveMatch) {
+            throw new IllegalStateException("Partida Finalizada/Cancelada");
+        }
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundException("Usuário não encontrado"));
+
+        if (groupPlayerRepository.existsByUserIdAndGroupId(userId,group.getId())) {
+            throw new IllegalArgumentException("Você já está na partida");
+        }
+
+        GroupPlayer groupPlayer = new GroupPlayer();
+        groupPlayer.setGroup(group);
+        groupPlayer.setUser(user);
+        groupPlayerRepository.save(groupPlayer);
     }
 }

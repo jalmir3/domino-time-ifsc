@@ -12,10 +12,12 @@ import sistema.model.GameGroup;
 import sistema.model.GroupType;
 import sistema.model.Match;
 import sistema.model.User;
-import sistema.service.*;
+import sistema.service.GameGroupService;
+import sistema.service.GroupService;
+import sistema.service.MatchService;
+import sistema.service.UserService;
 
 import java.nio.file.AccessDeniedException;
-import java.util.UUID;
 
 @Controller
 @RequestMapping("/groups")
@@ -26,7 +28,6 @@ public class GroupController {
     private final GroupService groupService;
     private final UserService userService;
     private final MatchService matchService;
-    private final PlayerScoreService playerScoreService;
 
     @GetMapping("/create")
     public String showCreateForm() {
@@ -37,15 +38,21 @@ public class GroupController {
     public String createGroup(
             @AuthenticationPrincipal UserDetails userDetails,
             @RequestParam("name") String name,
-            @RequestParam(value = "groupType", defaultValue = "PUBLIC") GroupType groupType,
+            @RequestParam(name = "groupType", defaultValue = "PUBLIC") GroupType groupType,
             RedirectAttributes redirectAttributes) {
 
-        User creator = userService.findByEmail(userDetails.getUsername())
-                .orElseThrow(() -> new UsernameNotFoundException("Usuário não encontrado"));
+        try {
+            User creator = userService.findByEmail(userDetails.getUsername())
+                    .orElseThrow(() -> new UsernameNotFoundException("Usuário não encontrado"));
 
-        GameGroup group = gameGroupService.createGroup(creator, name, groupType);
-        redirectAttributes.addFlashAttribute("success", "Grupo criado com sucesso!");
-        return "redirect:/groups/" + group.getAccessCode();
+            GameGroup group = gameGroupService.createGroup(creator, name, groupType);
+            redirectAttributes.addFlashAttribute("success", "Grupo criado com sucesso!");
+            return "redirect:/groups/" + group.getAccessCode();
+
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("error", "Erro ao criar grupo: " + e.getMessage());
+            return "redirect:/groups/create";
+        }
     }
 
     @GetMapping("/{accessCode}")
@@ -83,20 +90,38 @@ public class GroupController {
             throw new AccessDeniedException("Apenas o criador pode iniciar partidas");
         }
 
-        Match newMatch = matchService.startNewMatch(group,creator);
+        Match newMatch = matchService.startNewMatch(group, creator);
         redirectAttributes.addFlashAttribute("success", "Partida iniciada com sucesso!");
 
         return "redirect:/matches/" + newMatch.getId() + "/score";
     }
 
-    @PostMapping("/matches/{matchId}/scores")
-    public String registerScore(
-            @PathVariable UUID matchId,
-            @RequestParam UUID userId,
-            @RequestParam int score,
-            @RequestParam boolean isWinner
-    ) {
-        playerScoreService.registerScore(matchId, userId, score, isWinner);
-        return "redirect:/matches/" + matchId;
+    @GetMapping("/join")
+    public String showJoinForm() {
+        return "join-game";
+    }
+
+    @PostMapping("/join")
+    public String handleJoin(
+            @RequestParam("accessCode") String accessCode,
+            @AuthenticationPrincipal UserDetails userDetails,
+            RedirectAttributes redirectAttributes) {
+
+        try {
+            User user = userService.findByEmail(userDetails.getUsername())
+                    .orElseThrow(() -> new UsernameNotFoundException("Usuário não encontrado"));
+
+            gameGroupService.addPlayerToGroup(user.getId(), accessCode);
+            redirectAttributes.addFlashAttribute("success", "Você entrou no grupo com sucesso!");
+            return "redirect:/groups/" + accessCode;
+
+        } catch (IllegalArgumentException | IllegalStateException e) {
+            redirectAttributes.addFlashAttribute("error", e.getMessage());
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("error", "Ocorreu um erro ao entrar na partida");
+        }
+
+        redirectAttributes.addFlashAttribute("accessCode", accessCode);
+        return "redirect:/groups/join";
     }
 }
