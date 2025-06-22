@@ -3,7 +3,7 @@
       xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="UTF-8" name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Home</title>
+    <title>Criar Grupo</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" th:href="@{/style.css}">
@@ -34,18 +34,35 @@
         </div>
     </div>
 </div>
-<div class="domino-line">
-    <img src="/images/img-mobile.png" alt="domino-mobile" class="img-mobile">
-    <img src="/images/img-desktop.png" alt="domino-desktop" class="img-desktop">
+
+<div class="form-container">
+        <h2 class="title">Criar partida</h2>
+
+        <form th:action="@{/groups}" method="post" class="form">
+            <div class="form-group">
+                <label for="groupName">Nome do Grupo</label>
+                <input type="text" id="groupName" name="name" class="form-control"
+                       placeholder="Ex: Turma do Domino" required>
+            </div>
+
+            <div class="form-group">
+                <label>Privacidade</label>
+                <div class="radio-group" style="display: flex;">
+                    <input type="radio" id="public" name="groupType" value="PUBLIC" checked>
+                    <label for="public">Público (qualquer um pode entrar com o código)</label>
+                </div>
+                <div class="radio-group" style="display: flex;">
+                    <input type="radio" id="private" name="groupType" value="PRIVATE">
+                    <label for="private">Privado (somente com convite)</label>
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn">Criar grupo</button>
+        </form>
 </div>
-<div class="content">
-    <div class="left-box">
-        <div class="title">QUER JOGAR DOMINÓ?</div>
-        <div class="subtitle">Marque sua partida agora e entre no jogo!</div>
-    </div>
-</div>
+
 <div class="footer-bar">
-    Uma maneira fácil de usar para marcar sua pontuação do jogo de dominó em qualquer hora e lugar
+    Convide seus amigos e comece a marcar suas partidas de dominó agora mesmo!
 </div>
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>

@@ -1,9 +1,8 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org"
-      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.w3.org/1999/xhtml" xmlns:tr="http://www.w3.org/1999/xhtml">
 <head>
     <meta charset="UTF-8" name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Home</title>
+    <title>Partida</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" th:href="@{/style.css}">
@@ -34,18 +33,42 @@
         </div>
     </div>
 </div>
-<div class="domino-line">
-    <img src="/images/img-mobile.png" alt="domino-mobile" class="img-mobile">
-    <img src="/images/img-desktop.png" alt="domino-desktop" class="img-desktop">
-</div>
-<div class="content">
-    <div class="left-box">
-        <div class="title">QUER JOGAR DOMINÓ?</div>
-        <div class="subtitle">Marque sua partida agora e entre no jogo!</div>
-    </div>
+
+<div class="form-container">
+    <h1 class="title">Registrar Pontuação</h1>
+    <h2 class="subtitle" th:text="'Grupo: ' + ${group.name}"></h2>
+
+    <form th:action="@{'/matches/' + ${match.id} + '/save-scores'}" method="post">
+        <table class="score-table">
+            <thead>
+            <tr class="score-header-row">
+                <th class="score-header">Jogador</th>
+                <th class="score-header">Pontuação</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr class="score-row" th:each="player, stat : ${players}">
+                <td class="score-cell" th:text="${player.nickname}"></td>
+                <td class="score-cell">
+                    <input class="score-input" type="number"
+                           name="scores[]"
+                           th:value="0" min="0" required>
+                    <input type="hidden"
+                           name="playerIds[]"
+                           th:value="${player.id}">
+                </td>
+            </tr>
+        </table>
+        <button type="submit" class="btn btn-primary btn">Salvar Pontuações</button>
+    </form>
+    <form th:action="@{'/matches/' + ${match.id} + '/cancel'}" method="post" class="cancel-form">
+        <button type="submit" class="btn-cancel btn-danger btn-cancel" onclick="return confirm('Tem certeza que deseja cancelar esta partida?')">
+            Cancelar Partida
+        </button>
+    </form>
 </div>
 <div class="footer-bar">
-    Uma maneira fácil de usar para marcar sua pontuação do jogo de dominó em qualquer hora e lugar
+    Convide seus amigos e comece a marcar suas partidas de dominó agora mesmo!
 </div>
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
