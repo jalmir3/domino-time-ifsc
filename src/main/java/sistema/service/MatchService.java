@@ -5,23 +5,24 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.webjars.NotFoundException;
-import sistema.dto.ScoreDTO;
-import sistema.model.*;
+import sistema.model.GameGroup;
+import sistema.model.Match;
+import sistema.model.MatchStatus;
+import sistema.model.User;
 import sistema.repository.MatchRepository;
-import sistema.repository.PlayerScoreRepository;
-import sistema.repository.UserRepository;
 
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
 public class MatchService {
+
     private final MatchRepository matchRepository;
-    private final PlayerScoreService playerScoreService;
-    private final PlayerScoreRepository playerScoreRepository;
-    private final UserRepository userRepository;
+
+    public Optional<Match> findById(UUID matchId) {
+        return matchRepository.findById(matchId);
+    }
 
     public Match startNewMatch(GameGroup group, User creator) {
         if (!group.getCreatedBy().getId().equals(creator.getId())) {
@@ -32,37 +33,6 @@ public class MatchService {
         match.setGroup(group);
         match.setStatus(MatchStatus.IN_PROGRESS);
         return matchRepository.save(match);
-    }
-
-    public Optional<Match> findById(UUID matchId) {
-        return matchRepository.findById(matchId);
-    }
-
-    @Transactional
-    public void saveScores(UUID matchId, List<ScoreDTO> scores) {
-        Match match = matchRepository.findById(matchId)
-                .orElseThrow(() -> new RuntimeException("Match not found"));
-
-        int maxScore = scores.stream()
-                .mapToInt(ScoreDTO::score)
-                .max()
-                .orElse(0);
-
-        scores.forEach(dto -> {
-            User player = userRepository.findById(dto.userId())
-                    .orElseThrow(() -> new RuntimeException("Player not found: " + dto.userId()));
-
-            PlayerScore score = new PlayerScore();
-            score.setMatch(match);
-            score.setUser(player);
-            score.setScore(dto.score());
-            score.setIsWinner(dto.score() == maxScore);
-
-            playerScoreRepository.save(score);
-        });
-
-        match.setStatus(MatchStatus.FINISHED);
-        matchRepository.save(match);
     }
 
     @Transactional
@@ -80,7 +50,6 @@ public class MatchService {
         }
 
         match.setStatus(MatchStatus.CANCELED);
-
         Match updatedMatch = matchRepository.save(match);
 
         if (updatedMatch.getStatus() != MatchStatus.CANCELED) {

@@ -8,6 +8,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.webjars.NotFoundException;
 import sistema.model.GameGroup;
 import sistema.model.GroupType;
 import sistema.model.Match;
@@ -34,6 +35,11 @@ public class GroupController {
         return "create-group";
     }
 
+    @GetMapping("/join")
+    public String showJoinForm() {
+        return "join-game";
+    }
+
     @PostMapping
     public String createGroup(
             @AuthenticationPrincipal UserDetails userDetails,
@@ -43,7 +49,7 @@ public class GroupController {
 
         try {
             User creator = userService.findByEmail(userDetails.getUsername())
-                    .orElseThrow(() -> new UsernameNotFoundException("Usuário não encontrado"));
+                    .orElseThrow(() -> new NotFoundException("Usuário não encontrado"));
 
             GameGroup group = gameGroupService.createGroup(creator, name, groupType);
             redirectAttributes.addFlashAttribute("success", "Grupo criado com sucesso!");
@@ -62,7 +68,7 @@ public class GroupController {
             Model model) {
 
         User currentUser = userService.findByEmail(userDetails.getUsername())
-                .orElseThrow(() -> new UsernameNotFoundException("Usuário não encontrado"));
+                .orElseThrow(() -> new NotFoundException("Usuário não encontrado"));
 
         GameGroup group = groupService.findByAccessCode(accessCode);
         boolean isCreator = group.getCreatedBy().getId().equals(currentUser.getId());
@@ -82,7 +88,7 @@ public class GroupController {
             RedirectAttributes redirectAttributes) throws AccessDeniedException {
 
         User creator = userService.findByEmail(userDetails.getUsername())
-                .orElseThrow(() -> new UsernameNotFoundException("Usuário não encontrado"));
+                .orElseThrow(() -> new NotFoundException("Usuário não encontrado"));
 
         GameGroup group = groupService.findByAccessCode(accessCode);
 
@@ -94,11 +100,6 @@ public class GroupController {
         redirectAttributes.addFlashAttribute("success", "Partida iniciada com sucesso!");
 
         return "redirect:/matches/" + newMatch.getId() + "/score";
-    }
-
-    @GetMapping("/join")
-    public String showJoinForm() {
-        return "join-game";
     }
 
     @PostMapping("/join")

@@ -20,7 +20,7 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
     private final EmailService emailService;
 
-    public String registerUserWithActivation(UserRegistrationDto registrationDto) throws MessagingException {
+    public void registerUserWithActivation(UserRegistrationDto registrationDto) throws MessagingException {
         if (!registrationDto.getPassword().equals(registrationDto.getConfirmPassword())) {
             throw new IllegalArgumentException("Senhas não coincidem");
         }
@@ -47,8 +47,6 @@ public class UserService {
 
         String activationLink = "http://localhost:8080/activate?token=" + activationToken;
         emailService.sendActivationEmail(user.getEmail(), activationLink);
-
-        return activationToken;
     }
 
     public boolean activateUser(String token) {
@@ -94,5 +92,9 @@ public class UserService {
 
     public Optional<User> findByEmail(String email) {
         return userRepository.findByEmail(email);
+    }
+
+    public Optional<User> findById(UUID winnerId) {
+        return userRepository.findById(winnerId);
     }
 }

@@ -26,7 +26,7 @@
                 <a th:href="@{/account}">Gerenciar conta</a>
                 <a th:href="@{/groups/create}">Criar partida</a>
                 <a th:href="@{/groups/join}">Acessar partida</a>
-                <a th:href="@{/game/my-games}">Minhas partidas</a>
+                <a th:href="@{/matches/my-matches}">Minhas partidas</a>
                 <form class="logout-form" th:action="@{/logout}" method="post">
                     <button type="submit" class="btn-exit">Sair</button>
                 </form>
@@ -34,12 +34,25 @@
         </div>
     </div>
 </div>
-
 <div class="form-container">
     <h2 class="title" th:text="${group.name}"></h2>
-
     <div class="form-group">
-        <p>Código de acesso: <strong th:text="${group.accessCode}"></strong></p>
+        <label>Compartilhe o código de acesso:</label>
+        <div class="input-group code-input-group">
+            <input type="text" class="form-control code-input"
+                   th:value="${group.accessCode}"
+                   id="accessCodeInput"
+                   readonly>
+            <div class="input-group-append">
+                <button class="btn-copy"
+                        type="button"
+                        id="copyAccessCodeBtn"
+                        title="Copiar código">
+                    <i class="fas fa-copy"></i>
+                </button>
+            </div>
+        </div>
+
         <p th:if="${#strings.equals(group.privacy, 'PUBLIC')}">(Grupo Público)</p>
         <p th:unless="${#strings.equals(group.privacy, 'PUBLIC')}">(Grupo Privado)</p>
 
@@ -52,8 +65,8 @@
                 </button>
             </form>
         </div>
+    </div>
 </div>
-
 <div class="footer-bar">
     Convide seus amigos e comece a marcar suas partidas de dominó agora mesmo!
 </div>
@@ -61,6 +74,28 @@
 <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const copyBtn = document.getElementById('copyAccessCodeBtn');
+        const accessCodeInput = document.getElementById('accessCodeInput');
+
+        if (copyBtn && accessCodeInput) {
+            copyBtn.addEventListener('click', function() {
+                accessCodeInput.select();
+                document.execCommand('copy');
+
+                const originalTitle = copyBtn.getAttribute('title');
+                copyBtn.innerHTML = '<i class="fas fa-check"></i>';
+                copyBtn.setAttribute('title', 'Código copiado!');
+                copyBtn.classList.add('copied');
+
+                setTimeout(() => {
+                    copyBtn.innerHTML = '<i class="fas fa-copy"></i>';
+                    copyBtn.setAttribute('title', originalTitle);
+                    copyBtn.classList.remove('copied');
+                }, 2000);
+            });
+        }
+    });
     document.addEventListener('DOMContentLoaded', function() {
        const successAlert = document.getElementById('successAlert');
         if (successAlert) {

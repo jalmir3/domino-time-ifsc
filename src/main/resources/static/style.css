@@ -298,6 +298,50 @@ cursor: pointer;
     display: inline;
 }
 
+.code-input-group {
+    max-width: 300px;
+    margin-bottom: 15px;
+}
+
+.code-input {
+    border-right: none;
+    font-family: monospace;
+    font-size: 1.1rem;
+    letter-spacing: 1px;
+    text-align: center;
+    background-color: #f8f9fa;
+}
+
+.btn-copy {
+    background-color: #f8f9fa;
+    border: 1px solid #ced4da;
+    border-left: none;
+    color: #495057;
+    transition: all 0.3s ease;
+}
+
+.btn-copy:hover {
+    background-color: #e9ecef;
+    color: #212529;
+}
+
+.btn-copy:active {
+    background-color: #dee2e6;
+}
+
+.btn-copy.copied {
+    background-color: #28a745;
+    color: white;
+    border-color: #28a745;
+}
+
+.group-type {
+    color: #6c757d;
+    font-style: italic;
+    margin-top: -10px;
+    margin-bottom: 15px;
+}
+
 @keyframes button-loading-spinner {
     from {
         transform: rotate(0turn);
