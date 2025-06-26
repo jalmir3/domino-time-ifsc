@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8" name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vencedor da Partida</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+    <link rel="stylesheet" th:href="@{/style.css}">
+</head>
+<body>
+<div class="header">
+    <div class="logo">
+        <img th:onclick="|window.location.href='@{/home}'|" th:src="@{/images/logo.png}" alt="Logo" class="logo-img">
+    </div>
+    <div class="buttons">
+        <div sec:authorize="!isAuthenticated()">
+            <a class="form-group" th:onclick="|window.location.href='@{/login}'|">Entrar</a>
+            <div class="separator"></div>
+            <button class="button" th:onclick="|window.location.href='@{/register}'|">Cadastre-se</button>
+        </div>
+        <div sec:authorize="isAuthenticated()" class="user-dropdown">
+            <i class="fas fa-user-circle user-icon"></i>
+            <div class="dropdown-content">
+                <div class="user-name" th:text="${#authentication.principal.nickname}"></div>
+                <a th:href="@{/account}">Gerenciar conta</a>
+                <a th:href="@{/groups/create}">Criar partida</a>
+                <a th:href="@{/groups/join}">Acessar partida</a>
+                <a th:href="@{/matches/my-matches}">Minhas partidas</a>
+                <form class="logout-form" th:action="@{/logout}" method="post">
+                    <button type="submit" class="btn-exit">Sair</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="form-container alert alert-success">
+    <div class="form-group text-center">
+        <h1 class="animate__animated animate__heartBeat animate__infinite">
+            <span class="animate__animated animate__heartBeat animate__infinite">🎉</span>
+            Parabéns, <span th:text="${winnerName}" class="animate__animated animate__heartBeat animate__infinite">[Nome]</span>!
+            <span class="animate__animated animate__heartBeat animate__infinite">🎉</span>
+        </h1>
+        <p class="lead animate__animated animate__bounceIn">Você foi o grande vencedor desta partida!</p>
+        <a th:href="@{/home}" class="btn btn-primary btn-lg mt-4">Voltar ao Início</a>
+    </div>
+</div>
+<div class="footer-bar">
+    Uma maneira fácil de usar para marcar sua pontuação do jogo de dominó em qualquer hora e lugar
+</div>
+</body>
+</html>

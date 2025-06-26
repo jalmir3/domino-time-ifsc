@@ -137,7 +137,7 @@ public class MatchController {
     public String getUserMatches(
             @AuthenticationPrincipal UserDetails userDetails,
             @RequestParam(name = "page", defaultValue = "0") int page,
-            @RequestParam(name = "size", defaultValue = "10") int size,
+            @RequestParam(name = "size", defaultValue = "6") int size,
             Model model) {
 
         User user = userService.findByEmail(userDetails.getUsername())

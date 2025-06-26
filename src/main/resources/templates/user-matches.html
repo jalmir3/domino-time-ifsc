@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Minhas Partidas</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/style.css}">
+</head>
+<body>
+<div class="header">
+    <div class="logo">
+        <img th:onclick="|window.location.href='@{/home}'|" th:src="@{/images/logo.png}" alt="Logo" class="logo-img">
+    </div>
+    <div class="buttons">
+        <div sec:authorize="!isAuthenticated()">
+            <a class="form-group" th:onclick="|window.location.href='@{/login}'|">Entrar</a>
+            <div class="separator"></div>
+            <button class="button" th:onclick="|window.location.href='@{/register}'|">Cadastre-se</button>
+        </div>
+        <div sec:authorize="isAuthenticated()" class="user-dropdown">
+            <i class="fas fa-user-circle user-icon"></i>
+            <div class="dropdown-content">
+                <div class="user-name" th:text="${#authentication.principal.nickname}"></div>
+                <a th:href="@{/account}">Gerenciar conta</a>
+                <a th:href="@{/groups/create}">Criar partida</a>
+                <a th:href="@{/groups/join}">Acessar partida</a>
+                <a th:href="@{/matches/my-matches}">Minhas partidas</a>
+                <form class="logout-form" th:action="@{/logout}" method="post">
+                    <button type="submit" class="btn-exit">Sair</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="form-container">
+    <h1 class="title">Minhas Partidas</h1>
+
+    <table class="score-table">
+        <thead>
+        <tr class="score-header-row">
+            <th class="score-header">Grupo</th>
+            <th class="score-header">Pontuação</th>
+            <th class="score-header">Status</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="match : ${matchesPage.content}" class="score-row">
+            <td class="score-cell" th:text="${match.groupName}">Nome do Grupo</td>
+            <td class="score-cell" th:text="${match.playerScore + ' pontos'}">0 pontos</td>
+            <td class="score-cell">
+                <span th:if="${match.winner}" class="badge badge-success">VENCEDOR</span>
+                <span th:unless="${match.winner}" class="badge badge-secondary">PARTICIPANTE</span>
+            </td>
+        </tr>
+        <tr th:if="${matchesPage.content.empty}">
+            <td class="score-cell text-center" colspan="3">
+                Você ainda não participou de nenhuma partida.
+            </td>
+        </tr>
+        </tbody>
+    </table>
+    <nav th:if="${matchesPage.totalPages > 1}" class="mt-4">
+        <ul class="pagination justify-content-center">
+            <li class="page-item" th:classappend="${matchesPage.first} ? 'disabled' : ''">
+                <a class="page-link" th:href="@{/matches/my-matches(page=0,size=${matchesPage.size})}">
+                    <span aria-hidden="true">&laquo;&laquo;</span>
+                </a>
+            </li>
+            <li class="page-item" th:classappend="${matchesPage.first} ? 'disabled' : ''">
+                <a class="page-link" th:href="@{/matches/my-matches(page=${matchesPage.number-1},size=${matchesPage.size})}">
+                    <span aria-hidden="true">&laquo;</span>
+                </a>
+            </li>
+            <li th:each="i : ${#numbers.sequence(
+                T(java.lang.Math).max(0, matchesPage.number-2),
+                T(java.lang.Math).min(matchesPage.number+2, matchesPage.totalPages-1))}"
+                class="page-item" th:classappend="${i == matchesPage.number} ? 'active' : ''">
+                <a class="page-link" th:href="@{/matches/my-matches(page=${i},size=${matchesPage.size})}"
+                   th:text="${i+1}">1</a>
+            </li>
+            <li class="page-item" th:classappend="${matchesPage.last} ? 'disabled' : ''">
+                <a class="page-link" th:href="@{/matches/my-matches(page=${matchesPage.number+1},size=${matchesPage.size})}">
+                    <span aria-hidden="true">&raquo;</span>
+                </a>
+            </li>
+            <li class="page-item" th:classappend="${matchesPage.last} ? 'disabled' : ''">
+                <a class="page-link" th:href="@{/matches/my-matches(page=${matchesPage.totalPages-1},size=${matchesPage.size})}">
+                    <span aria-hidden="true">&raquo;&raquo;</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+    <div class="card total-points mt-4">
+        <div class="card-body text-center">
+            <h4>Total de Pontos</h4>
+            <h2 th:text="${totalPoints} + ' pontos'" class="text-primary">0 pontos</h2>
+        </div>
+    </div>
+</div>
+<div class="footer-bar">
+    Convide seus amigos e comece a marcar suas partidas de dominó agora mesmo!
+</div>
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const userIcons = document.querySelectorAll('.user-icon');
+        const dropdownContents = document.querySelectorAll('.dropdown-content');
+
+        userIcons.forEach(icon => {
+            icon.addEventListener('click', function(e) {
+                e.stopPropagation();
+                const dropdown = this.closest('.user-dropdown');
+                const content = dropdown.querySelector('.dropdown-content');
+
+                dropdownContents.forEach(dc => {
+                    if (dc !== content) {
+                        dc.style.display = 'none';
+                    }
+                });
+                content.style.display = content.style.display === 'block' ? 'none' : 'block';
+            });
+        });
+        document.addEventListener('click', function(e) {
+            if (!e.target.closest('.user-dropdown')) {
+                dropdownContents.forEach(content => {
+                    content.style.display = 'none';
+                });
+            }
+        });
+    });
+</script>
+</body>
+</html>
