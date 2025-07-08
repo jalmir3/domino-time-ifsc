@@ -403,8 +403,7 @@ cursor: pointer;
   }
 
   .score-header, .score-cell {
-      padding: 10px 12px;
-      min-width: 110px;
+      padding: 10px 8px;
   }
 
   .score-input {

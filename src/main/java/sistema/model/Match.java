@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.GenericGenerator;
 
+import java.time.LocalDate;
 import java.util.UUID;
 
 @Entity
@@ -25,4 +26,7 @@ public class Match {
     @Enumerated(EnumType.STRING)
     @Column(name = "status", columnDefinition = "VARCHAR(20) DEFAULT 'IN_PROGRESS'")
     private MatchStatus status = MatchStatus.IN_PROGRESS;
+
+    @Column(name = "match_date", nullable = false)
+    private LocalDate matchDate = LocalDate.now();
 }

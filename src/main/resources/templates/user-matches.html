@@ -43,6 +43,7 @@
         <tr class="score-header-row">
             <th class="score-header">Grupo</th>
             <th class="score-header">Pontuação</th>
+            <th class="score-header">Data</th>
             <th class="score-header">Status</th>
         </tr>
         </thead>
@@ -50,13 +51,14 @@
         <tr th:each="match : ${matchesPage.content}" class="score-row">
             <td class="score-cell" th:text="${match.groupName}">Nome do Grupo</td>
             <td class="score-cell" th:text="${match.playerScore + ' pontos'}">0 pontos</td>
+            <td class="score-cell" th:text="${#temporals.format(match.matchDate, 'dd/MM/yyyy')}"></td>
             <td class="score-cell">
                 <span th:if="${match.winner}" class="badge badge-success">VENCEDOR</span>
                 <span th:unless="${match.winner}" class="badge badge-secondary">PARTICIPANTE</span>
             </td>
         </tr>
         <tr th:if="${matchesPage.content.empty}">
-            <td class="score-cell text-center" colspan="3">
+            <td class="score-cell text-center" colspan="4">
                 Você ainda não participou de nenhuma partida.
             </td>
         </tr>

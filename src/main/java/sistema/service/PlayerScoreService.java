@@ -76,6 +76,7 @@ public class PlayerScoreService {
         dto.setGroupName(score.getMatch().getGroup().getName());
         dto.setPlayerScore(score.getScore());
         dto.setWinner(score.getIsWinner());
+        dto.setMatchDate(score.getMatch().getMatchDate());
         return dto;
     }
 }
