@@ -29,4 +29,17 @@ public class Match {
 
     @Column(name = "match_date", nullable = false)
     private LocalDate matchDate = LocalDate.now();
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "game_mode", columnDefinition = "VARCHAR(20) DEFAULT 'INDIVIDUAL'")
+    private GameMode gameMode;
+
+    @Column(name = "winner", nullable = true)
+    private String winner;
+
+    @Column(name = "final_score_teamA", nullable = true)
+    private Integer finalScoreA;
+
+    @Column(name = "final_score_teamB", nullable = true)
+    private Integer finalScoreB;
 }

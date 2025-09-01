@@ -25,4 +25,7 @@ public class GroupPlayer {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false, columnDefinition = "UUID")
     private User user;
+
+    @Column(name = "team", nullable = true)
+    private String team;
 }

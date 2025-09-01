@@ -36,29 +36,16 @@
 </div>
 
 <div class="form-container">
-        <h2 class="title">Criar partida</h2>
+    <h2 class="title">Criar partida</h2>
 
-        <form th:action="@{/groups}" method="post" class="form">
-            <div class="form-group">
-                <label for="groupName">Nome do Grupo</label>
-                <input type="text" id="groupName" name="name" class="form-control"
-                       placeholder="Ex: Turma do Domino" required>
-            </div>
-
-            <div class="form-group">
-                <label>Privacidade</label>
-                <div class="radio-group" style="display: flex;">
-                    <input type="radio" id="public" name="groupType" value="PUBLIC" checked>
-                    <label for="public">Público (qualquer um pode entrar com o código)</label>
-                </div>
-                <div class="radio-group" style="display: flex;">
-                    <input type="radio" id="private" name="groupType" value="PRIVATE">
-                    <label for="private">Privado (somente com convite)</label>
-                </div>
-            </div>
-
-            <button type="submit" class="btn btn-primary btn">Criar grupo</button>
-        </form>
+    <form th:action="@{/groups}" method="post" class="form">
+        <div class="form-group">
+            <label for="groupName">Nome do Grupo</label>
+            <input type="text" id="groupName" name="name" class="form-control"
+                   placeholder="Ex: Turma do Domino" required>
+        </div>
+        <button type="submit" class="btn btn-primary btn">Criar grupo</button>
+    </form>
 </div>
 
 <div class="footer-bar">
@@ -69,32 +56,31 @@
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 <script>
     document.addEventListener('DOMContentLoaded', function() {
+        const userIcons = document.querySelectorAll('.user-icon');
+        const dropdownContents = document.querySelectorAll('.dropdown-content');
 
-    const userIcons = document.querySelectorAll('.user-icon');
-    const dropdownContents = document.querySelectorAll('.dropdown-content');
+        userIcons.forEach(icon => {
+            icon.addEventListener('click', function(e) {
+                e.stopPropagation();
+                const dropdown = this.closest('.user-dropdown');
+                const content = dropdown.querySelector('.dropdown-content');
 
-    userIcons.forEach(icon => {
-        icon.addEventListener('click', function(e) {
-            e.stopPropagation();
-            const dropdown = this.closest('.user-dropdown');
-            const content = dropdown.querySelector('.dropdown-content');
-
-            dropdownContents.forEach(dc => {
-                if (dc !== content) {
-                    dc.style.display = 'none';
-                }
+                dropdownContents.forEach(dc => {
+                    if (dc !== content) {
+                        dc.style.display = 'none';
+                    }
+                });
+                content.style.display = content.style.display === 'block' ? 'none' : 'block';
             });
-            content.style.display = content.style.display === 'block' ? 'none' : 'block';
+        });
+        document.addEventListener('click', function(e) {
+            if (!e.target.closest('.user-dropdown')) {
+                dropdownContents.forEach(content => {
+                    content.style.display = 'none';
+                });
+            }
         });
     });
-    document.addEventListener('click', function(e) {
-        if (!e.target.closest('.user-dropdown')) {
-            dropdownContents.forEach(content => {
-                content.style.display = 'none';
-            });
-        }
-    });
-});
 </script>
 </body>
 </html>

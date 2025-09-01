@@ -12,17 +12,12 @@ import java.util.UUID;
 @Data
 @NoArgsConstructor
 public class PlayerScore {
+
     @Id
     @GeneratedValue(generator = "UUID")
     @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
     @Column(name = "id", updatable = false, nullable = false, columnDefinition = "UUID")
     private UUID id;
-
-    @Column(name = "score", nullable = false)
-    private Integer score;
-
-    @Column(name = "is_winner", nullable = false)
-    private Boolean isWinner = false;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "match_id", nullable = false, columnDefinition = "UUID")
@@ -31,4 +26,22 @@ public class PlayerScore {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false, columnDefinition = "UUID")
     private User user;
+
+    @Column(name = "total_score", nullable = false)
+    private Integer totalScore = 0;
+
+    @Column(name = "current_round", nullable = false)
+    private Integer currentRound = 1;
+
+    @Column(name = "team", length = 1)
+    private String team;
+
+    @Column(name = "is_winner")
+    private Boolean isWinner = false;
+
+    @Column(name = "score")
+    private Integer score;
+
+    @Column(name = "round_number")
+    private Integer roundNumber;
 }

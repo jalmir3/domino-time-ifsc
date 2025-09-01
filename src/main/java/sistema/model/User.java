@@ -53,6 +53,9 @@ public class User {
 
     @Column(name = "password_reset_expiry")
     private LocalDateTime passwordResetExpiry;
+
+    @Column(name = "avatar_url")
+    private String avatarUrl;
 }
 
 

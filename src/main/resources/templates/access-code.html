@@ -52,18 +52,13 @@
                 </button>
             </div>
         </div>
-
-        <p th:if="${#strings.equals(group.privacy, 'PUBLIC')}">(Grupo Público)</p>
-        <p th:unless="${#strings.equals(group.privacy, 'PUBLIC')}">(Grupo Privado)</p>
-
         <div th:if="${success}" class="alert alert-success" th:text="${success}" id="successAlert"></div>
 
-        <div th:if="${isCreator}" class="actions">
-            <form th:action="@{'/groups/' + ${group.accessCode} + '/start-match'}" method="post">
-                <button type="submit" class="btn btn-primary btn">
-                    Iniciar Nova Partida
-                </button>
-            </form>
+        <div th:if="${isCreator}">
+            <a th:href="@{'/groups/' + ${group.accessCode} + '/configure'}"
+               class="btn btn-primary btn-lg">
+                <i class="fas fa-cog"></i> Configurar Partida
+            </a>
         </div>
     </div>
 </div>
