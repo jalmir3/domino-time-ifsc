@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerenciar Conta</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/style.css}">
+</head>
+<body>
+<div class="header">
+    <div class="logo">
+        <img th:onclick="|window.location.href='@{/home}'|" th:src="@{/images/logo.png}" alt="Logo" class="logo-img">
+    </div>
+    <div class="buttons">
+        <div sec:authorize="isAuthenticated()" class="user-dropdown">
+            <i class="fas fa-user-circle user-icon"></i>
+            <div class="dropdown-content">
+                <div class="user-name" th:text="${#authentication.principal.nickname}"></div>
+                <a th:href="@{/account}">Gerenciar conta</a>
+                <a th:href="@{/groups/create}">Criar partida</a>
+                <a th:href="@{/groups/join}">Acessar partida</a>
+                <a th:href="@{/matches/my-matches}">Minhas partidas</a>
+                <form class="logout-form" th:action="@{/logout}" method="post">
+                    <button type="submit" class="btn-exit">Sair</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="form-container">
+    <h1 class="title">Gerenciar Conta</h1>
+
+    <div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show" role="alert">
+        <span th:text="${successMessage}"></span>
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+
+    <div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show" role="alert">
+        <span th:text="${errorMessage}"></span>
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+
+    <form th:action="@{/account/update}" method="post" enctype="multipart/form-data" class="form">
+        <div class="form-group text-center mb-4">
+            <div class="avatar-container position-relative d-inline-block">
+                <img th:src="${user.avatarUrl} ? @{${user.avatarUrl}} : @{/images/default-avatar.png}"
+                     alt="Avatar" class="avatar-preview rounded-circle" id="avatarPreview"
+                     style="width: 150px; height: 150px; object-fit: cover; border: 3px solid #dee2e6;">
+                <label for="avatar" class="avatar-edit-btn position-absolute" style="bottom: 10px; right: 10px; cursor: pointer;">
+                    <i class="fas fa-camera bg-primary text-white rounded-circle p-2"></i>
+                </label>
+            </div>
+            <input type="file" id="avatar" name="avatar" accept="image/*" class="d-none" onchange="previewImage(this)">
+            <small class="form-text text-muted">Clique no ícone da câmera para alterar sua foto</small>
+        </div>
+
+        <div class="form-group">
+            <label for="nickname">Apelido</label>
+            <input type="text" class="form-control" id="nickname" name="nickname"
+                   th:value="${user.nickname}" required maxlength="100">
+            <small class="form-text text-muted">Seu apelido é único e será exibido para outros jogadores</small>
+        </div>
+
+        <div class="form-group">
+            <label for="email">Email</label>
+            <input type="email" class="form-control" id="email" name="email"
+                   th:value="${user.email}" required maxlength="100">
+        </div>
+
+        <div class="form-group">
+            <label for="birthDate">Data de Nascimento</label>
+            <input type="date" class="form-control" id="birthDate" name="birthDate"
+                   th:value="${#temporals.format(user.birthDate, 'yyyy-MM-dd')}" required>
+        </div>
+
+        <div class="card mb-4">
+            <div class="card-header bg-light">
+                <h5 class="mb-0">Alterar Senha</h5>
+            </div>
+            <div class="card-body">
+                <div class="form-group">
+                    <label for="currentPassword">Senha Atual</label>
+                    <input type="password" class="form-control" id="currentPassword" name="currentPassword">
+                    <small class="form-text text-muted">Deixe em branco se não quiser alterar a senha</small>
+                </div>
+
+                <div class="form-group">
+                    <label for="newPassword">Nova Senha</label>
+                    <input type="password" class="form-control" id="newPassword" name="newPassword">
+                </div>
+
+                <div class="form-group">
+                    <label for="confirmPassword">Confirmar Nova Senha</label>
+                    <input type="password" class="form-control" id="confirmPassword" name="confirmPassword">
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <button type="submit" class="btn btn-primary btn-block">Salvar Alterações</button>
+        </div>
+    </form>
+
+<!--    <div class="card border-danger mt-5">-->
+<!--        <div class="card-header bg-danger text-white">-->
+<!--            <h5 class="mb-0">Zona de Perigo</h5>-->
+<!--        </div>-->
+<!--        <div class="card-body">-->
+<!--            <h6 class="card-title text-danger">Excluir Conta Permanentemente</h6>-->
+<!--            <p class="card-text">-->
+<!--                Esta ação não pode ser desfeita. Todos os seus dados, incluindo partidas, pontuações e informações pessoais, serão permanentemente removidos do sistema.-->
+<!--            </p>-->
+
+<!--            <button type="button" class="btn btn-outline-danger" data-toggle="modal" data-target="#deleteAccountModal">-->
+<!--                Excluir Minha Conta-->
+<!--            </button>-->
+<!--        </div>-->
+<!--    </div>-->
+<!--</div>-->
+
+<!--<div class="modal fade" id="deleteAccountModal" tabindex="-1" role="dialog" aria-labelledby="deleteAccountModalLabel" aria-hidden="true">-->
+<!--    <div class="modal-dialog" role="document">-->
+<!--        <div class="modal-content">-->
+<!--            <div class="modal-header">-->
+<!--                <h5 class="modal-title" id="deleteAccountModalLabel">Confirmar Exclusão de Conta</h5>-->
+<!--                <button type="button" class="close" data-dismiss="modal" aria-label="Close">-->
+<!--                    <span aria-hidden="true">&times;</span>-->
+<!--                </button>-->
+<!--            </div>-->
+<!--            <div class="modal-body">-->
+<!--                <p class="text-danger"><strong>Atenção: Esta ação é irreversível!</strong></p>-->
+<!--                <p>Todos os seus dados serão permanentemente excluídos, incluindo:</p>-->
+<!--                <ul>-->
+<!--                    <li>Seu perfil de usuário</li>-->
+<!--                    <li>Histórico de partidas</li>-->
+<!--                    <li>Pontuações e estatísticas</li>-->
+<!--                    <li>Grupos criados por você</li>-->
+<!--                </ul>-->
+<!--                <p>Para confirmar, digite sua senha abaixo:</p>-->
+<!--                <form id="deleteAccountForm" th:action="@{/account/delete}" method="post">-->
+<!--                    <div class="form-group">-->
+<!--                        <label for="passwordToDelete">Senha</label>-->
+<!--                        <input type="password" class="form-control" id="passwordToDelete" name="password" required>-->
+<!--                    </div>-->
+<!--                </form>-->
+<!--            </div>-->
+<!--            <div class="modal-footer">-->
+<!--                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>-->
+<!--                <button type="button" class="btn btn-danger" onclick="document.getElementById('deleteAccountForm').submit()">-->
+<!--                    Excluir Conta Permanentemente-->
+<!--                </button>-->
+<!--            </div>-->
+<!--        </div>-->
+<!--    </div>-->
+<!--</div>-->
+
+<div class="footer-bar">
+    Convide seus amigos e comece a marcar suas partidas de dominó agora mesmo!
+</div>
+
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script>
+    function previewImage(input) {
+        if (input.files && input.files[0]) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                document.getElementById('avatarPreview').src = e.target.result;
+            }
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const form = document.querySelector('form');
+        form.addEventListener('submit', function(e) {
+            const newPassword = document.getElementById('newPassword').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            const currentPassword = document.getElementById('currentPassword').value;
+
+            if (newPassword && !currentPassword) {
+                e.preventDefault();
+                alert('Para alterar a senha, é necessário informar a senha atual.');
+                return;
+            }
+
+            if (newPassword && newPassword !== confirmPassword) {
+                e.preventDefault();
+                alert('As novas senhas não coincidem.');
+                return;
+            }
+        });
+
+        const userIcons = document.querySelectorAll('.user-icon');
+        const dropdownContents = document.querySelectorAll('.dropdown-content');
+
+        userIcons.forEach(icon => {
+            icon.addEventListener('click', function(e) {
+                e.stopPropagation();
+                const dropdown = this.closest('.user-dropdown');
+                const content = dropdown.querySelector('.dropdown-content');
+
+                dropdownContents.forEach(dc => {
+                    if (dc !== content) {
+                        dc.style.display = 'none';
+                    }
+                });
+                content.style.display = content.style.display === 'block' ? 'none' : 'block';
+            });
+        });
+
+        document.addEventListener('click', function(e) {
+            if (!e.target.closest('.user-dropdown')) {
+                dropdownContents.forEach(content => {
+                    content.style.display = 'none';
+                });
+            }
+        });
+    });
+</script>
+</body>
+</html>

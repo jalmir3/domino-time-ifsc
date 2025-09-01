@@ -1,12 +1,15 @@
 package sistema.service;
 
 import jakarta.mail.MessagingException;
+import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import sistema.dto.UserRegistrationDto;
 import sistema.model.User;
 import sistema.model.UserStatus;
+import sistema.repository.GroupPlayerRepository;
+import sistema.repository.PlayerScoreRepository;
 import sistema.repository.UserRepository;
 
 import java.time.LocalDateTime;
@@ -17,6 +20,8 @@ import java.util.UUID;
 @AllArgsConstructor
 public class UserService {
     private final UserRepository userRepository;
+    private final PlayerScoreRepository playerScoreRepository;
+    private final GroupPlayerRepository groupPlayerRepository;
     private final PasswordEncoder passwordEncoder;
     private final EmailService emailService;
 
@@ -96,5 +101,24 @@ public class UserService {
 
     public Optional<User> findById(UUID winnerId) {
         return userRepository.findById(winnerId);
+    }
+
+    public void updateUser(User user) {
+        userRepository.save(user);
+    }
+
+    public boolean validatePassword(User user, String rawPassword) {
+        return passwordEncoder.matches(rawPassword, user.getPassword());
+    }
+
+    public String encodePassword(String rawPassword) {
+        return passwordEncoder.encode(rawPassword);
+    }
+
+    @Transactional
+    public void deleteUser(UUID userId) {
+        playerScoreRepository.deleteByUserId(userId);
+        groupPlayerRepository.deleteByUserId(userId);
+        userRepository.deleteById(userId);
     }
 }
