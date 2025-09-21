@@ -99,21 +99,6 @@ public class MatchController {
         return "user-matches";
     }
 
-    @GetMapping("/{matchId}/info")
-    @ResponseBody
-    public ResponseEntity<Map<String, Object>> getMatchInfo(@PathVariable("matchId") UUID matchId) {
-        try {
-            Match match = matchService.findById(matchId)
-                    .orElseThrow(() -> new NotFoundException("Partida não encontrada"));
-            Map<String, Object> response = new HashMap<>();
-            response.put("gameMode", match.getGameMode());
-            response.put("status", match.getStatus());
-            return ResponseEntity.ok(response);
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-        }
-    }
-
     @GetMapping("/{matchId}/score")
     public String showScoreForm(
             @PathVariable("matchId") UUID matchId,

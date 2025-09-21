@@ -186,15 +186,4 @@ public class GroupController {
             return "redirect:/groups/" + accessCode + "/configure";
         }
     }
-
-    @GetMapping("/{accessCode}/status")
-    @ResponseBody
-    public Map<String, Object> checkGroupStatus(@PathVariable("accessCode") String accessCode) {
-        GameGroup group = groupService.findByAccessCode(accessCode);
-        List<User> players = gameGroupService.getPlayersInGroup(group.getId());
-        return Map.of(
-                "maxPlayersReached", players.size() >= 4,
-                "playerCount", players.size()
-        );
-    }
 }
