@@ -12,7 +12,6 @@ import java.util.Collections;
 
 @AllArgsConstructor
 public class CustomUserDetails implements UserDetails {
-
     private final transient User user;
 
     @Override
@@ -52,5 +51,9 @@ public class CustomUserDetails implements UserDetails {
 
     public String getNickname() {
         return user.getNickname();
+    }
+
+    public String getAvatar() {
+        return user.getAvatar();
     }
 }

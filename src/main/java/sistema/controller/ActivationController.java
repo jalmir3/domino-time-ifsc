@@ -12,13 +12,11 @@ import sistema.service.UserService;
 @Data
 @RequestMapping("/activate")
 public class ActivationController {
-
     private final UserService userService;
 
     @GetMapping
     public String activateAccount(@RequestParam("token") String token, Model model) {
         boolean activated = userService.activateUser(token);
-
         if (activated) {
             model.addAttribute("ativacaoSucesso", true);
             return "login";

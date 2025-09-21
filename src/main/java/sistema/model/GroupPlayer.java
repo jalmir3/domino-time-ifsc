@@ -17,12 +17,12 @@ public class GroupPlayer {
     @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
     @Column(name = "id", updatable = false, nullable = false, columnDefinition = "UUID")
     private UUID id;
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "group_id", nullable = false, columnDefinition = "UUID")
     private GameGroup group;
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false, columnDefinition = "UUID")
     private User user;
+    @Column(name = "team", nullable = true)
+    private String team;
 }

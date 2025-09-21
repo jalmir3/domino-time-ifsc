@@ -14,7 +14,6 @@ import sistema.service.UserService;
 @Data
 @RequestMapping("/reset-password")
 public class PasswordResetTokenController {
-
     private final UserService userService;
 
     @GetMapping
@@ -35,12 +34,10 @@ public class PasswordResetTokenController {
                                        Model model) {
         try {
             passwordDto.validatePasswordMatch();
-
             if (result.hasErrors()) {
                 model.addAttribute("token", token);
                 return "reset-password";
             }
-
             userService.resetPassword(token, passwordDto.getNewPassword());
             model.addAttribute("message", "Senha alterada com sucesso!");
             return "redirect:/login";

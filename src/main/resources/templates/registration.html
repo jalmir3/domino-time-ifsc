@@ -14,7 +14,6 @@
 </div>
 <div class="form-container">
     <h2 class="title">Crie a sua conta</h2>
-
     <form class="form" th:action="@{/register}" th:object="${user}" method="post" id="registerForm">
         <div class="form-group">
             <label for="email">Email</label>
@@ -65,15 +64,12 @@
     document.getElementById('registerForm').addEventListener('submit', function(e) {
         const submitBtn = document.getElementById('submitBtn');
         const btnText = document.getElementById('btnText');
-
         if (!submitBtn.dataset.originalText) {
             submitBtn.dataset.originalText = btnText.innerHTML;
         }
-
         submitBtn.classList.add('btn-loading');
         submitBtn.disabled = true;
         btnText.innerHTML = 'Processando...';
-
         setTimeout(() => {
             submitBtn.classList.remove('btn-loading');
             submitBtn.disabled = false;

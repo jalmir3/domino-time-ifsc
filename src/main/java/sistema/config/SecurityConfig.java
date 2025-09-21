@@ -17,7 +17,6 @@ import org.springframework.security.web.SecurityFilterChain;
 @EnableWebSecurity
 @AllArgsConstructor
 public class SecurityConfig {
-
     private final UserDetailsService userDetailsService;
 
     @Bean
@@ -66,7 +65,6 @@ public class SecurityConfig {
                         .logoutSuccessUrl("/home")
                         .permitAll()
                 );
-
         return http.build();
     }
 }

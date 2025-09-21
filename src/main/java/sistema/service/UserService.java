@@ -1,7 +1,9 @@
 package sistema.service;
 
 import jakarta.mail.MessagingException;
+import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import sistema.dto.UserRegistrationDto;
@@ -24,17 +26,13 @@ public class UserService {
         if (!registrationDto.getPassword().equals(registrationDto.getConfirmPassword())) {
             throw new IllegalArgumentException("Senhas não coincidem");
         }
-
-        if (userRepository.findByEmail(registrationDto.getEmail()).isPresent()) {
+        if (userRepository.findByEmailAndDeletedFalse(registrationDto.getEmail()).isPresent()) {
             throw new IllegalArgumentException("Email já cadastrado");
         }
-
-        if (userRepository.findByNickname(registrationDto.getNickname()).isPresent()) {
+        if (userRepository.findByNicknameAndDeletedFalse(registrationDto.getNickname()).isPresent()) {
             throw new IllegalArgumentException("Apelido já cadastrado");
         }
-
         String activationToken = UUID.randomUUID().toString();
-
         User user = new User();
         user.setEmail(registrationDto.getEmail());
         user.setPassword(passwordEncoder.encode(registrationDto.getPassword()));
@@ -42,9 +40,7 @@ public class UserService {
         user.setBirthDate(registrationDto.getBirthDate());
         user.setNickname(registrationDto.getNickname());
         user.setStatus(UserStatus.INACTIVE);
-
         userRepository.save(user);
-
         String activationLink = "http://localhost:8080/activate?token=" + activationToken;
         emailService.sendActivationEmail(user.getEmail(), activationLink);
     }
@@ -64,12 +60,10 @@ public class UserService {
     public String createPasswordResetToken(String email) {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new IllegalArgumentException("Email não cadastrado"));
-
         String token = UUID.randomUUID().toString();
         user.setPasswordResetToken(token);
         user.setPasswordResetExpiry(LocalDateTime.now().plusHours(24));
         userRepository.save(user);
-
         return token;
     }
 
@@ -83,7 +77,6 @@ public class UserService {
         User user = userRepository.findByPasswordResetToken(token)
                 .filter(u -> u.getPasswordResetExpiry().isAfter(LocalDateTime.now()))
                 .orElseThrow(() -> new IllegalArgumentException("Token inválido ou expirado"));
-
         user.setPassword(passwordEncoder.encode(newPassword));
         user.setPasswordResetToken(null);
         user.setPasswordResetExpiry(null);
@@ -96,5 +89,38 @@ public class UserService {
 
     public Optional<User> findById(UUID winnerId) {
         return userRepository.findById(winnerId);
+    }
+
+    public boolean isNicknameInUseByOtherUser(String nickname, UUID currentUserId) {
+        return userRepository.findByNicknameAndDeletedFalse(nickname)
+                .map(user -> !user.getId().equals(currentUserId))
+                .orElse(false);
+    }
+
+    public void updateUser(User user) {
+        userRepository.save(user);
+    }
+
+    public boolean validatePassword(User user, String rawPassword) {
+        return passwordEncoder.matches(rawPassword, user.getPassword());
+    }
+
+    public String encodePassword(String rawPassword) {
+        return passwordEncoder.encode(rawPassword);
+    }
+
+    @Transactional
+    public void softDeleteUser(UUID userId, String password) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("Usuário não encontrado"));
+        if (!passwordEncoder.matches(password, user.getPassword())) {
+            throw new IllegalArgumentException("Senha incorreta");
+        }
+        user.setDeleted(true);
+        user.setEmail("");
+        user.setStatus(UserStatus.DELETED);
+        user.setDeletedAt(LocalDateTime.now());
+        userRepository.save(user);
+        SecurityContextHolder.clearContext();
     }
 }

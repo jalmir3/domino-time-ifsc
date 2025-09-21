@@ -17,7 +17,6 @@ import sistema.service.UserService;
 @Data
 @RequestMapping("/forgot-password")
 public class PasswordResetController {
-
     private final UserService userService;
     private final EmailService emailService;
 
@@ -34,12 +33,10 @@ public class PasswordResetController {
         if (result.hasErrors()) {
             return "forgot-password";
         }
-
         try {
             String token = userService.createPasswordResetToken(request.getEmail());
             String resetLink = "http://localhost:8080/reset-password?token=" + token;
             emailService.sendPasswordResetEmail(request.getEmail(), resetLink);
-
             model.addAttribute("message", "Enviamos um link para redefinir sua senha para o email informado");
             return "forgot-password";
         } catch (Exception e) {

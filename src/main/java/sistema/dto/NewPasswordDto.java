@@ -6,11 +6,9 @@ import lombok.Data;
 
 @Data
 public class NewPasswordDto {
-
     @NotBlank(message = "Senha é obrigatória")
     @Size(min = 6, message = "Senha deve ter no mínimo 6 caracteres")
     private String newPassword;
-
     @NotBlank(message = "Confirmação de senha é obrigatória")
     private String confirmPassword;
 

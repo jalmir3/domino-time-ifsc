@@ -16,7 +16,6 @@ import sistema.service.UserService;
 @RequestMapping("/register")
 public class RegistrationController {
     private final UserService userService;
-
     private String registration = "registration";
 
     public RegistrationController(UserService userService) {

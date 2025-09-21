@@ -1,10 +1,14 @@
 package sistema.service;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.webjars.NotFoundException;
 import sistema.model.*;
-import sistema.repository.*;
+import sistema.repository.GameGroupRepository;
+import sistema.repository.GroupPlayerRepository;
+import sistema.repository.MatchRepository;
+import sistema.repository.UserRepository;
 
 import java.util.List;
 import java.util.UUID;
@@ -13,26 +17,21 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class GameGroupService {
-
-    private final GameGroupRepository groupRepository;
+    private final GameGroupRepository gameGroupRepository;
     private final GroupPlayerRepository groupPlayerRepository;
     private final MatchRepository matchRepository;
     private final UserRepository userRepository;
 
-    public GameGroup createGroup(User creator, String groupName, GroupType groupType) {
+    public GameGroup createGroup(User creator, String groupName) {
         GameGroup group = new GameGroup();
         group.setName(groupName);
         group.setCreatedBy(creator);
         group.setAccessCode(generateRandomCode());
-        group.setPrivacy(groupType);
-
-        var savedGroup = groupRepository.save(group);
-
+        var savedGroup = gameGroupRepository.save(group);
         GroupPlayer creatorMembership = new GroupPlayer();
         creatorMembership.setUser(creator);
         creatorMembership.setGroup(savedGroup);
         groupPlayerRepository.save(creatorMembership);
-
         return savedGroup;
     }
 
@@ -55,25 +54,42 @@ public class GameGroupService {
     }
 
     public void addPlayerToGroup(UUID userId, String accessCode) {
-        GameGroup group = groupRepository.findByAccessCode(accessCode)
+        GameGroup group = gameGroupRepository.findByAccessCode(accessCode)
                 .orElseThrow(() -> new NotFoundException("Partida não encontrada"));
-
-        boolean hasActiveMatch = !matchRepository.findByGroupIdAndStatus(group.getId(), MatchStatus.IN_PROGRESS).isEmpty();
-
-        if (!hasActiveMatch) {
-            throw new IllegalStateException("Partida Finalizada/Cancelada");
-        }
-
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException("Usuário não encontrado"));
-
-        if (groupPlayerRepository.existsByUserIdAndGroupId(userId,group.getId())) {
+        long playerCount = groupPlayerRepository.countByGroupId(group.getId());
+        if (playerCount >= 4) {
+            throw new IllegalStateException("A partida já está cheia (4 jogadores)");
+        }
+        if (groupPlayerRepository.existsByUserIdAndGroupId(userId, group.getId())) {
             throw new IllegalArgumentException("Você já está na partida");
         }
-
         GroupPlayer groupPlayer = new GroupPlayer();
         groupPlayer.setGroup(group);
         groupPlayer.setUser(user);
         groupPlayerRepository.save(groupPlayer);
+    }
+
+    public List<User> getTeamPlayers(UUID groupId, String team) {
+        return groupPlayerRepository.findByGroupIdAndTeam(groupId, team).stream()
+                .map(GroupPlayer::getUser)
+                .collect(Collectors.toList());
+    }
+
+    @Transactional
+    public void saveTeams(UUID groupId, List<UUID> teamAPlayerIds, List<UUID> teamBPlayerIds) {
+        for (UUID playerId : teamAPlayerIds) {
+            GroupPlayer groupPlayer = groupPlayerRepository.findByGroupIdAndUserId(groupId, playerId)
+                    .orElseThrow(() -> new NotFoundException("Jogador não encontrado no grupo"));
+            groupPlayer.setTeam("A");
+            groupPlayerRepository.save(groupPlayer);
+        }
+        for (UUID playerId : teamBPlayerIds) {
+            GroupPlayer groupPlayer = groupPlayerRepository.findByGroupIdAndUserId(groupId, playerId)
+                    .orElseThrow(() -> new NotFoundException("Jogador não encontrado no grupo"));
+            groupPlayer.setTeam("B");
+            groupPlayerRepository.save(groupPlayer);
+        }
     }
 }
