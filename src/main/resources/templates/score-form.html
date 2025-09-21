@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" th:href="@{/style.css}">
+    <script th:src="@{/js/userAvatar.js}"></script>
 </head>
 <body>
 <div class="header">
@@ -14,13 +15,9 @@
         <img th:onclick="|window.location.href='@{/home}'|" th:src="@{/images/logo.png}" alt="Logo" class="logo-img">
     </div>
     <div class="buttons">
-        <div sec:authorize="!isAuthenticated()">
-            <a class="form-group" th:onclick="|window.location.href='@{/login}'|">Entrar</a>
-            <div class="separator"></div>
-            <button class="button" th:onclick="|window.location.href='@{/register}'|">Cadastre-se</button>
-        </div>
         <div sec:authorize="isAuthenticated()" class="user-dropdown">
-            <i class="fas fa-user-circle user-icon"></i>
+            <i class="fas fa-user-circle user-icon" id="userAvatarIcon"
+               th:attr="data-avatar=${#authentication.principal.avatar}"></i>
             <div class="dropdown-content">
                 <div class="user-name" th:text="${#authentication.principal.nickname}"></div>
                 <a th:href="@{/account}">Gerenciar conta</a>
@@ -34,11 +31,9 @@
         </div>
     </div>
 </div>
-
 <div class="form-container">
     <h1 class="title">Registrar Pontuação</h1>
     <h2 class="subtitle" th:text="'Grupo: ' + ${group.name}"></h2>
-
     <div class="game-info">
         <div class="game-mode">
             <strong>Modo de Jogo:</strong>
@@ -49,7 +44,6 @@
         </div>
         <div id="matchId" style="display:none" th:text="${match.id}"></div>
     </div>
-
     <div th:if="${gameMode == T(sistema.model.GameMode).TEAMS}">
         <div th:if="${hasWinner}">
             <div class="alert alert-success">
@@ -58,15 +52,12 @@
                 <p th:text="'Placar Final - Time A: ' + ${teamAScore} + ' x Time B: ' + ${teamBScore}"></p>
             </div>
         </div>
-
         <div th:if="${!hasWinner}">
             <form th:action="@{'/matches/' + ${match.id} + '/save-round'}" method="post" id="teamsForm">
                 <input type="hidden" name="roundNumber" th:value="${currentRound}">
-
                 <div class="round-info">
                     <h4>Rodada <span th:text="${currentRound}">1</span></h4>
                 </div>
-
                 <table class="score-table" id="teamsTable">
                     <thead>
                     <tr class="score-header-row">
@@ -101,15 +92,12 @@
                     </tr>
                     </tbody>
                 </table>
-
                 <input type="hidden" name="teamAPlayerIds" th:value="${#strings.listJoin(teamAPlayerIds, ',')}">
                 <input type="hidden" name="teamBPlayerIds" th:value="${#strings.listJoin(teamBPlayerIds, ',')}">
-
                 <div class="action-buttons">
                     <button type="submit" class="btn btn-primary">Salvar Rodada</button>
                 </div>
             </form>
-
             <form th:if="${!hasWinner}" th:action="@{'/matches/' + ${match.id} + '/cancel'}" method="post" class="cancel-form">
                 <div class="action-buttons">
                     <button type="submit" class="btn btn-danger"
@@ -119,9 +107,8 @@
                 </div>
             </form>
         </div>
-
         <div class="history-panel" th:if="${roundsHistory != null and not roundsHistory.empty}">
-            <h4 class="title-middle">Histórico de Rodadas</h4>
+            <h4 class="title-middle">Última partida</h4>
             <table class="table table-sm">
                 <thead>
                 <tr>
@@ -143,31 +130,25 @@
                 </tbody>
             </table>
         </div>
-
         <div class="alert alert-info" th:if="${roundsHistory == null or roundsHistory.empty}">
             <i class="fas fa-info-circle"></i> Nenhuma rodada registrada ainda.
         </div>
     </div>
-
     <div th:if="${gameMode != T(sistema.model.GameMode).TEAMS}">
         <div th:if="${hasWinner}" class="alert alert-success">
             <h4>Partida Finalizada!</h4>
             <p>Vencedor: <span th:text="${match.winner}"></span></p>
         </div>
-
         <form id="scoreForm" th:action="@{'/matches/' + ${match.id} + '/save-individual-scores'}" method="post"
               th:unless="${hasWinner}">
             <input type="hidden" name="roundNumber" th:value="${currentRound}">
-
             <div class="round-info">
                 <h4>Rodada <span th:text="${currentRound}">1</span></h4>
             </div>
-
             <div th:if="${players == null or players.empty}" class="alert alert-warning">
                 <i class="fas fa-exclamation-circle"></i> Nenhum jogador encontrado para esta partida. Adicione
                 jogadores ao grupo antes de continuar.
             </div>
-
             <table class="score-table" th:unless="${players == null or players.empty}">
                 <thead>
                 <tr class="score-header-row">
@@ -192,12 +173,10 @@
                 </tr>
                 </tbody>
             </table>
-
             <div class="action-buttons">
                 <button type="submit" class="btn btn-primary">Salvar Rodada</button>
             </div>
         </form>
-
         <form th:if="${!hasWinner}" th:action="@{'/matches/' + ${match.id} + '/cancel'}" method="post" class="cancel-form">
             <div class="action-buttons">
                 <button type="submit" class="btn btn-danger"
@@ -206,7 +185,6 @@
                 </button>
             </div>
         </form>
-
         <div class="history-panel" th:if="${roundsHistory != null and not roundsHistory.empty}">
             <h4 class="title-middle">Histórico de Rodadas</h4>
             <table class="table table-sm">
@@ -228,17 +206,14 @@
                 </tbody>
             </table>
         </div>
-
         <div class="alert alert-info" th:if="${roundsHistory == null or roundsHistory.empty}">
             <i class="fas fa-info-circle"></i> Nenhuma rodada registrada ainda.
         </div>
     </div>
 </div>
-
 <div class="footer-bar">
     Convide seus amigos e comece a marcar suas partidas de dominó agora mesmo!
 </div>
-
 <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
@@ -246,13 +221,11 @@
     document.addEventListener('DOMContentLoaded', function() {
         const userIcons = document.querySelectorAll('.user-icon');
         const dropdownContents = document.querySelectorAll('.dropdown-content');
-
         userIcons.forEach(icon => {
             icon.addEventListener('click', function(e) {
                 e.stopPropagation();
                 const dropdown = this.closest('.user-dropdown');
                 const content = dropdown.querySelector('.dropdown-content');
-
                 dropdownContents.forEach(dc => {
                     if (dc !== content) {
                         dc.style.display = 'none';
@@ -261,7 +234,6 @@
                 content.style.display = content.style.display === 'block' ? 'none' : 'block';
             });
         });
-
         document.addEventListener('click', function(e) {
             if (!e.target.closest('.user-dropdown')) {
                 dropdownContents.forEach(content => {
@@ -269,11 +241,9 @@
                 });
             }
         });
-
         const matchId = document.getElementById('matchId').textContent;
         const storageKey = `domino_scores_${matchId}`;
         const gameMode = /*[[${gameMode}]]*/ 'INDIVIDUAL';
-
         let scoreData = {
             players: {},
             history: [],
@@ -281,13 +251,11 @@
             teamB: 0,
             baseScores: {}
         };
-
         document.querySelectorAll('.total-score').forEach(cell => {
             const playerId = cell.id.replace('total-', '');
             const baseScore = parseInt(cell.getAttribute('data-base')) || 0;
             scoreData.baseScores[playerId] = baseScore;
         });
-
         const saved = localStorage.getItem(storageKey);
         if (saved) {
             const loadedData = JSON.parse(saved);
@@ -296,7 +264,6 @@
             scoreData.teamA = loadedData.teamA || 0;
             scoreData.teamB = loadedData.teamB || 0;
             scoreData.baseScores = loadedData.baseScores || {};
-
             document.querySelectorAll('.total-score').forEach(cell => {
                 const playerId = cell.id.replace('total-', '');
                 if (scoreData.baseScores[playerId] === undefined) {
@@ -305,13 +272,11 @@
                 }
             });
         }
-
         if (gameMode !== 'TEAMS') {
             updateIndividualTotals();
         } else {
             updateTotals();
         }
-
         document.querySelectorAll('.score-input').forEach(input => {
             input.addEventListener('input', function() {
                 if (gameMode === 'TEAMS') {
@@ -321,11 +286,9 @@
                     updateIndividualTotals();
                 }
             });
-
             input.addEventListener('change', function() {
                 const playerId = this.parentNode.querySelector('input[type="hidden"]')?.value;
                 const score = parseInt(this.value) || 0;
-
                 if (gameMode === 'TEAMS') {
                     const team = this.name === 'teamAScore' ? 'teamA' : 'teamB';
                     scoreData[team] = score;
@@ -333,40 +296,32 @@
                 } else {
                     updateScore(playerId, score);
                 }
-
                 saveScores();
             });
         });
-
         function updateScore(playerId, score) {
             scoreData.players[playerId] = score;
             saveScores();
         }
-
         function updateTotals() {
             if (isTeamsMode()) {
                 const teamABase = parseInt(document.getElementById('total-teamA').getAttribute('data-base')) || 0;
                 const teamBBase = parseInt(document.getElementById('total-teamB').getAttribute('data-base')) || 0;
-
                 const teamAInput = document.querySelector('.team-a-input');
                 const teamBInput = document.querySelector('.team-b-input');
                 const teamARound = parseInt(teamAInput.value) || 0;
                 const teamBRound = parseInt(teamBInput.value) || 0;
-
                 const totalTeamA = teamABase + teamARound;
                 const totalTeamB = teamBBase + teamBRound;
-
                 document.querySelector('.team-score:first-child .score-value').textContent = totalTeamA;
                 document.querySelector('.team-score:last-child .score-value').textContent = totalTeamB;
                 document.getElementById('total-teamA').textContent = totalTeamA;
                 document.getElementById('total-teamB').textContent = totalTeamB;
-
                 scoreData.teamA = teamARound;
                 scoreData.teamB = teamBRound;
             }
             saveScores();
         }
-
         function updateIndividualTotals() {
             document.querySelectorAll('tr.score-row').forEach(row => {
                 const input = row.querySelector('input.score-input');
@@ -377,11 +332,9 @@
                 totalCell.textContent = total;
             });
         }
-
         function saveScores() {
             localStorage.setItem(storageKey, JSON.stringify(scoreData));
         }
-
         function isTeamsMode() {
             return document.getElementById('gameModeBadge').textContent.trim() === 'Dupla';
         }

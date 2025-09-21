@@ -1,5 +1,4 @@
 package sistema.controller;
-
 import jakarta.mail.MessagingException;
 import jakarta.validation.Valid;
 import org.springframework.stereotype.Controller;
@@ -11,24 +10,19 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import sistema.dto.UserRegistrationDto;
 import sistema.service.UserService;
-
 @Controller
 @RequestMapping("/register")
 public class RegistrationController {
     private final UserService userService;
-
     private String registration = "registration";
-
     public RegistrationController(UserService userService) {
         this.userService = userService;
     }
-
     @GetMapping
     public String showRegistrationForm(Model model) {
         model.addAttribute("user", new UserRegistrationDto());
         return registration;
     }
-
     @PostMapping
     public String registerUser(@ModelAttribute("user") @Valid UserRegistrationDto userDto,
                                BindingResult result,

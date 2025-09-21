@@ -1,15 +1,18 @@
 package sistema.controller;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import sistema.model.User;
-import sistema.service.FileStorageService;
+import sistema.security.CustomUserDetails;
 import sistema.service.UserService;
 
 import java.security.Principal;
@@ -17,13 +20,10 @@ import java.security.Principal;
 @Controller
 @RequestMapping("/account")
 public class AccountController {
-
     private final UserService userService;
-    private final FileStorageService fileStorageService;
 
-    public AccountController(UserService userService, FileStorageService fileStorageService) {
+    public AccountController(UserService userService) {
         this.userService = userService;
-        this.fileStorageService = fileStorageService;
     }
 
     @GetMapping
@@ -41,64 +41,84 @@ public class AccountController {
             @RequestParam("birthDate") String birthDate,
             @RequestParam(value = "currentPassword", required = false) String currentPassword,
             @RequestParam(value = "newPassword", required = false) String newPassword,
-            @RequestParam(value = "avatar", required = false) MultipartFile avatar,
+            @RequestParam(value = "confirmPassword", required = false) String confirmPassword,
+            @RequestParam(value = "avatarBase64", required = false) String avatarBase64,
             Principal principal,
-            RedirectAttributes redirectAttributes) {
-
+            Model model) {
         try {
             User user = userService.findByEmail(principal.getName())
                     .orElseThrow(() -> new IllegalArgumentException("Usuário não encontrado"));
-
+            if (userService.isNicknameInUseByOtherUser(nickname, user.getId())) {
+                model.addAttribute("errorMessage", "Este apelido já está em uso por outro usuário");
+                model.addAttribute("user", user);
+                return "account";
+            }
             user.setNickname(nickname);
             user.setEmail(email);
             user.setBirthDate(java.time.LocalDate.parse(birthDate));
-
-            if (avatar != null && !avatar.isEmpty()) {
-                String avatarUrl = fileStorageService.storeFile(avatar, "avatars", user.getId().toString());
-                user.setAvatarUrl(avatarUrl);
+            if (avatarBase64 != null && !avatarBase64.isEmpty() && avatarBase64.startsWith("data:image")) {
+                user.setAvatar(avatarBase64);
             }
-
             if (newPassword != null && !newPassword.trim().isEmpty()) {
                 if (!userService.validatePassword(user, currentPassword)) {
-                    redirectAttributes.addFlashAttribute("errorMessage", "Senha atual incorreta");
-                    return "redirect:/account";
+                    model.addAttribute("errorMessage", "Senha atual incorreta");
+                    model.addAttribute("user", user);
+                    return "account";
+                }
+                if (!newPassword.equals(confirmPassword)) {
+                    model.addAttribute("errorMessage", "A nova senha e a confirmação não coincidem");
+                    model.addAttribute("user", user);
+                    return "account";
                 }
                 user.setPassword(userService.encodePassword(newPassword));
             }
-
             userService.updateUser(user);
-            redirectAttributes.addFlashAttribute("successMessage", "Conta atualizada com sucesso!");
-
+            CustomUserDetails userDetails = new CustomUserDetails(user);
+            UsernamePasswordAuthenticationToken authentication =
+                    new UsernamePasswordAuthenticationToken(
+                            userDetails,
+                            null,
+                            userDetails.getAuthorities()
+                    );
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+            model.addAttribute("successMessage", "Conta atualizada com sucesso!");
+            model.addAttribute("user", user);
         } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("errorMessage", "Erro ao atualizar conta: " + e.getMessage());
+            model.addAttribute("errorMessage", "Erro ao atualizar conta: " + e.getMessage());
+            User user = userService.findByEmail(principal.getName()).orElse(null);
+            if (user != null) {
+                model.addAttribute("user", user);
+            }
         }
-
-        return "redirect:/account";
+        return "account";
     }
 
     @PostMapping("/delete")
     public String deleteAccount(
             @RequestParam("password") String password,
             Principal principal,
-            RedirectAttributes redirectAttributes) {
-
+            Model model,
+            HttpServletRequest request,
+            HttpServletResponse response) {
         try {
             User user = userService.findByEmail(principal.getName())
                     .orElseThrow(() -> new IllegalArgumentException("Usuário não encontrado"));
-
             if (!userService.validatePassword(user, password)) {
-                redirectAttributes.addFlashAttribute("errorMessage", "Senha incorreta");
-                return "redirect:/account";
+                model.addAttribute("errorMessage", "Senha incorreta");
+                model.addAttribute("user", user);
+                return "account";
             }
-
-            userService.deleteUser(user.getId());
-
-            redirectAttributes.addFlashAttribute("successMessage", "Sua conta foi excluída com sucesso.");
-            return "redirect:/logout";
-
+            userService.softDeleteUser(user.getId(), password);
+            new SecurityContextLogoutHandler().logout(request, response,
+                    SecurityContextHolder.getContext().getAuthentication());
+            return "redirect:/login?deleted";
         } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("errorMessage", "Erro ao excluir conta: " + e.getMessage());
-            return "redirect:/account";
+            model.addAttribute("errorMessage", "Erro ao desativar conta: " + e.getMessage());
+            User user = userService.findByEmail(principal.getName()).orElse(null);
+            if (user != null) {
+                model.addAttribute("user", user);
+            }
+            return "account";
         }
     }
 }

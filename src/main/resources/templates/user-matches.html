@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" th:href="@{/style.css}">
+    <script th:src="@{/js/userAvatar.js}"></script>
 </head>
 <body>
 <div class="header">
@@ -15,13 +16,9 @@
         <img th:onclick="|window.location.href='@{/home}'|" th:src="@{/images/logo.png}" alt="Logo" class="logo-img">
     </div>
     <div class="buttons">
-        <div sec:authorize="!isAuthenticated()">
-            <a class="form-group" th:onclick="|window.location.href='@{/login}'|">Entrar</a>
-            <div class="separator"></div>
-            <button class="button" th:onclick="|window.location.href='@{/register}'|">Cadastre-se</button>
-        </div>
         <div sec:authorize="isAuthenticated()" class="user-dropdown">
-            <i class="fas fa-user-circle user-icon"></i>
+            <i class="fas fa-user-circle user-icon" id="userAvatarIcon"
+               th:attr="data-avatar=${#authentication.principal.avatar}"></i>
             <div class="dropdown-content">
                 <div class="user-name" th:text="${#authentication.principal.nickname}"></div>
                 <a th:href="@{/account}">Gerenciar conta</a>
@@ -37,7 +34,6 @@
 </div>
 <div class="form-container">
     <h1 class="title">Minhas Partidas</h1>
-
     <table class="score-table">
         <thead>
         <tr class="score-header-row">
@@ -112,13 +108,11 @@
     document.addEventListener('DOMContentLoaded', function() {
         const userIcons = document.querySelectorAll('.user-icon');
         const dropdownContents = document.querySelectorAll('.dropdown-content');
-
         userIcons.forEach(icon => {
             icon.addEventListener('click', function(e) {
                 e.stopPropagation();
                 const dropdown = this.closest('.user-dropdown');
                 const content = dropdown.querySelector('.dropdown-content');
-
                 dropdownContents.forEach(dc => {
                     if (dc !== content) {
                         dc.style.display = 'none';
