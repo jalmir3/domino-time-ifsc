@@ -60,40 +60,6 @@
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-<script>
-    document.getElementById('registerForm').addEventListener('submit', function(e) {
-        const submitBtn = document.getElementById('submitBtn');
-        const btnText = document.getElementById('btnText');
-        if (!submitBtn.dataset.originalText) {
-            submitBtn.dataset.originalText = btnText.innerHTML;
-        }
-        submitBtn.classList.add('btn-loading');
-        submitBtn.disabled = true;
-        btnText.innerHTML = 'Processando...';
-        setTimeout(() => {
-            submitBtn.classList.remove('btn-loading');
-            submitBtn.disabled = false;
-            btnText.innerHTML = submitBtn.dataset.originalText;
-        }, 10000);
-    });
-    document.addEventListener('DOMContentLoaded', function () {
-        const errorAlert = document.getElementById('errorAlert');
-        if (errorAlert) {
-            setTimeout(() => {
-                errorAlert.classList.add('fade');
-                setTimeout(() => errorAlert.remove(), 500);
-            }, 2500);
-        }
-    });
-    document.addEventListener('DOMContentLoaded', function () {
-        const successAlert = document.getElementById('successAlert');
-        if (successAlert) {
-            setTimeout(() => {
-                successAlert.classList.add('fade');
-                setTimeout(() => successAlert.remove(), 500);
-            }, 5000);
-        }
-    });
-</script>
+<script th:src="@{/js/common.js}"></script>
 </body>
 </html>
