@@ -1,4 +1,5 @@
 package sistema.controller;
+
 import jakarta.validation.Valid;
 import lombok.Data;
 import org.springframework.stereotype.Controller;
@@ -8,11 +9,13 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import sistema.dto.NewPasswordDto;
 import sistema.service.UserService;
+
 @Controller
 @Data
 @RequestMapping("/reset-password")
 public class PasswordResetTokenController {
     private final UserService userService;
+
     @GetMapping
     public String showResetPasswordForm(@RequestParam("token") String token, RedirectAttributes redirectAttributes, Model model) {
         if (userService.isPasswordResetTokenValid(token)) {
@@ -23,6 +26,7 @@ public class PasswordResetTokenController {
         redirectAttributes.addFlashAttribute("error", "Token inválido ou expirado. Por favor, solicite um novo link.");
         return "redirect:/forgot-password";
     }
+
     @PostMapping
     public String processResetPassword(@Valid @ModelAttribute("password") NewPasswordDto passwordDto,
                                        BindingResult result,

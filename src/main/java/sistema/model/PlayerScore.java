@@ -1,9 +1,12 @@
 package sistema.model;
+
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.GenericGenerator;
+
 import java.util.UUID;
+
 @Entity
 @Table(name = "player_scores")
 @Data

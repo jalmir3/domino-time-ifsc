@@ -1,4 +1,5 @@
 package sistema.controller;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -23,9 +24,11 @@ import sistema.service.GameGroupService;
 import sistema.service.MatchService;
 import sistema.service.PlayerScoreService;
 import sistema.service.UserService;
+
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+
 @Controller
 @Slf4j
 @RequestMapping("/matches")
@@ -35,6 +38,7 @@ public class MatchController {
     private final UserService userService;
     private final GameGroupService gameGroupService;
     private final PlayerScoreService playerScoreService;
+
     @PostMapping(value = "/{matchId}/save-scores",
             consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
     public String saveScores(
@@ -59,6 +63,7 @@ public class MatchController {
             return "redirect:/matches/" + matchId;
         }
     }
+
     @PostMapping("/{matchId}/cancel")
     public String cancelMatch(
             @PathVariable("matchId") UUID matchId,
@@ -77,6 +82,7 @@ public class MatchController {
         }
         return "redirect:/matches/" + matchId;
     }
+
     @GetMapping("/my-matches")
     public String getUserMatches(
             @AuthenticationPrincipal UserDetails userDetails,
@@ -92,6 +98,7 @@ public class MatchController {
         model.addAttribute("totalPoints", totalPoints);
         return "user-matches";
     }
+
     @GetMapping("/{matchId}/info")
     @ResponseBody
     public ResponseEntity<Map<String, Object>> getMatchInfo(@PathVariable("matchId") UUID matchId) {
@@ -106,6 +113,7 @@ public class MatchController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
+
     @GetMapping("/{matchId}/score")
     public String showScoreForm(
             @PathVariable("matchId") UUID matchId,
@@ -162,6 +170,7 @@ public class MatchController {
         model.addAttribute("hasWinner", hasWinner);
         return "score-form";
     }
+
     @PostMapping("/{matchId}/save-round")
     public String saveRound(
             @PathVariable("matchId") UUID matchId,
@@ -187,6 +196,7 @@ public class MatchController {
         }
         return "redirect:/matches/" + matchId + "/score";
     }
+
     @PostMapping("/{matchId}/save-individual-scores")
     public String saveIndividualScores(
             @PathVariable("matchId") UUID matchId,

@@ -1,4 +1,5 @@
 package sistema.controller;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -8,14 +9,19 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.webjars.NotFoundException;
-import sistema.model.*;
+import sistema.model.GameGroup;
+import sistema.model.GameMode;
+import sistema.model.Match;
+import sistema.model.User;
 import sistema.service.GameGroupService;
 import sistema.service.GroupService;
 import sistema.service.MatchService;
 import sistema.service.UserService;
+
 import java.nio.file.AccessDeniedException;
 import java.util.*;
 import java.util.stream.Collectors;
+
 @Controller
 @RequestMapping("/groups")
 @RequiredArgsConstructor
@@ -24,14 +30,17 @@ public class GroupController {
     private final GroupService groupService;
     private final UserService userService;
     private final MatchService matchService;
+
     @GetMapping("/create")
     public String showCreateForm() {
         return "create-group";
     }
+
     @GetMapping("/join")
     public String showJoinForm() {
         return "join-game";
     }
+
     @PostMapping
     public String createGroup(
             @AuthenticationPrincipal UserDetails userDetails,
@@ -48,6 +57,7 @@ public class GroupController {
             return "redirect:/groups/create";
         }
     }
+
     @GetMapping("/{accessCode}")
     public String viewGroup(
             @PathVariable("accessCode") String accessCode,
@@ -63,6 +73,7 @@ public class GroupController {
         model.addAttribute("activeMatches", gameGroupService.getActiveMatches(group.getId()));
         return "access-code";
     }
+
     @PostMapping("/{accessCode}/start")
     public String startMatch(
             @PathVariable String accessCode,
@@ -88,6 +99,7 @@ public class GroupController {
             return "redirect:/groups/" + accessCode + "/configure";
         }
     }
+
     @PostMapping("/join")
     public String handleJoin(
             @RequestParam("accessCode") String accessCode,
@@ -108,6 +120,7 @@ public class GroupController {
         redirectAttributes.addFlashAttribute("accessCode", accessCode);
         return "redirect:/groups/join";
     }
+
     @GetMapping("/{accessCode}/configure")
     public String configureMatch(
             @PathVariable("accessCode") String accessCode,
@@ -126,6 +139,7 @@ public class GroupController {
         model.addAttribute("gameModes", GameMode.values());
         return "configure-match";
     }
+
     @PostMapping("/{accessCode}/start-configured")
     public String startConfiguredMatch(
             @PathVariable("accessCode") String accessCode,
@@ -172,6 +186,7 @@ public class GroupController {
             return "redirect:/groups/" + accessCode + "/configure";
         }
     }
+
     @GetMapping("/{accessCode}/status")
     @ResponseBody
     public Map<String, Object> checkGroupStatus(@PathVariable("accessCode") String accessCode) {

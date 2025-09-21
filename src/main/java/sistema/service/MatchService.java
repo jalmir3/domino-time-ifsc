@@ -1,4 +1,5 @@
 package sistema.service;
+
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.AccessDeniedException;
@@ -6,16 +7,20 @@ import org.springframework.stereotype.Service;
 import org.webjars.NotFoundException;
 import sistema.model.*;
 import sistema.repository.MatchRepository;
+
 import java.util.*;
 import java.util.stream.Collectors;
+
 @Service
 @RequiredArgsConstructor
 public class MatchService {
     private final MatchRepository matchRepository;
     private final GameGroupService gameGroupService;
+
     public Optional<Match> findById(UUID matchId) {
         return matchRepository.findById(matchId);
     }
+
     @Transactional
     public void cancelMatch(UUID matchId) {
         Match match = matchRepository.findById(matchId)
@@ -26,6 +31,7 @@ public class MatchService {
         match.setStatus(MatchStatus.CANCELED);
         matchRepository.save(match);
     }
+
     @Transactional
     public Match startConfiguredMatch(GameGroup group, User creator, GameMode gameMode,
                                       List<UUID> teamA, List<UUID> teamB) {
@@ -53,6 +59,7 @@ public class MatchService {
         }
         return match;
     }
+
     private void validateTeams(List<UUID> teamA, List<UUID> teamB, List<User> allPlayers) {
         if (teamA == null || teamB == null || teamA.size() != 2 || teamB.size() != 2) {
             throw new IllegalArgumentException("Selecione exatamente 2 jogadores para cada time");

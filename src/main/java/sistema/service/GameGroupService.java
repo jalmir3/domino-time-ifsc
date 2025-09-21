@@ -1,4 +1,5 @@
 package sistema.service;
+
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -8,9 +9,11 @@ import sistema.repository.GameGroupRepository;
 import sistema.repository.GroupPlayerRepository;
 import sistema.repository.MatchRepository;
 import sistema.repository.UserRepository;
+
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
+
 @Service
 @RequiredArgsConstructor
 public class GameGroupService {
@@ -18,6 +21,7 @@ public class GameGroupService {
     private final GroupPlayerRepository groupPlayerRepository;
     private final MatchRepository matchRepository;
     private final UserRepository userRepository;
+
     public GameGroup createGroup(User creator, String groupName) {
         GameGroup group = new GameGroup();
         group.setName(groupName);
@@ -30,20 +34,25 @@ public class GameGroupService {
         groupPlayerRepository.save(creatorMembership);
         return savedGroup;
     }
+
     private String generateRandomCode() {
         return UUID.randomUUID().toString().substring(0, 8).toUpperCase();
     }
+
     public List<Match> getActiveMatches(UUID groupId) {
         return matchRepository.findByGroupIdAndStatus(groupId, MatchStatus.IN_PROGRESS);
     }
+
     public boolean isUserInGroup(UUID userId, UUID groupId) {
         return groupPlayerRepository.existsByUserIdAndGroupId(userId, groupId);
     }
+
     public List<User> getPlayersInGroup(UUID groupId) {
         return groupPlayerRepository.findByGroupId(groupId).stream()
                 .map(GroupPlayer::getUser)
                 .collect(Collectors.toList());
     }
+
     public void addPlayerToGroup(UUID userId, String accessCode) {
         GameGroup group = gameGroupRepository.findByAccessCode(accessCode)
                 .orElseThrow(() -> new NotFoundException("Partida não encontrada"));
@@ -61,11 +70,13 @@ public class GameGroupService {
         groupPlayer.setUser(user);
         groupPlayerRepository.save(groupPlayer);
     }
+
     public List<User> getTeamPlayers(UUID groupId, String team) {
         return groupPlayerRepository.findByGroupIdAndTeam(groupId, team).stream()
                 .map(GroupPlayer::getUser)
                 .collect(Collectors.toList());
     }
+
     @Transactional
     public void saveTeams(UUID groupId, List<UUID> teamAPlayerIds, List<UUID> teamBPlayerIds) {
         for (UUID playerId : teamAPlayerIds) {

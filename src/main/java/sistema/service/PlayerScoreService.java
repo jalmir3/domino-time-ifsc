@@ -1,4 +1,5 @@
 package sistema.service;
+
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -13,7 +14,12 @@ import sistema.repository.MatchRepository;
 import sistema.repository.PlayerScoreRepository;
 import sistema.repository.RoundHistoryRepository;
 import sistema.repository.UserRepository;
-import java.util.*;
+
+import java.util.Comparator;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+
 @Service
 @Slf4j
 @RequiredArgsConstructor
@@ -23,6 +29,7 @@ public class PlayerScoreService {
     private final MatchRepository matchRepository;
     private final RoundHistoryRepository roundHistoryRepository;
     private static final int WINNING_THRESHOLD = 100;
+
     public UUID saveScoresAndGetWinner(UUID matchId, List<ScoreDTO> scores) {
         Match match = matchRepository.findById(matchId)
                 .orElseThrow(() -> new NotFoundException("Partida não encontrada"));
@@ -47,13 +54,16 @@ public class PlayerScoreService {
         matchRepository.save(match);
         return winnerDto.userId();
     }
+
     public int sumTotalPointsByUserId(UUID id) {
         return playerScoreRepository.sumScoresByUserId(id);
     }
+
     public Page<PlayerMatchDTO> getUserMatches(UUID userId, Pageable pageable) {
         Page<PlayerScore> scoresPage = playerScoreRepository.findByUserId(userId, pageable);
         return scoresPage.map(this::convertToDTO);
     }
+
     private PlayerMatchDTO convertToDTO(PlayerScore score) {
         PlayerMatchDTO dto = new PlayerMatchDTO();
         dto.setMatchId(score.getMatch().getId());
@@ -63,6 +73,7 @@ public class PlayerScoreService {
         dto.setMatchDate(score.getMatch().getMatchDate());
         return dto;
     }
+
     @Transactional
     public void saveTeamRound(UUID matchId, Integer roundNumber, Integer teamAScore,
                               Integer teamBScore, List<UUID> teamAPlayerIds, List<UUID> teamBPlayerIds) {
@@ -112,6 +123,7 @@ public class PlayerScoreService {
         roundHistoryRepository.save(roundHistory);
         checkAndFinishMatch(matchId, match.getGameMode());
     }
+
     @Transactional
     public void saveIndividualRound(UUID matchId, Integer roundNumber, List<ScoreDTO> scoreDTOs) {
         Match match = matchRepository.findById(matchId)
@@ -134,9 +146,11 @@ public class PlayerScoreService {
         }
         checkAndFinishMatch(matchId, match.getGameMode());
     }
+
     public Integer getTotalScoreByTeam(UUID matchId, String team) {
         return playerScoreRepository.sumScoresByMatchAndTeam(matchId, team);
     }
+
     private void checkAndFinishMatch(UUID matchId, GameMode gameMode) {
         Match match = matchRepository.findById(matchId)
                 .orElseThrow(() -> new NotFoundException("Partida não encontrada"));
@@ -171,20 +185,24 @@ public class PlayerScoreService {
             }
         }
     }
+
     private void markWinners(UUID matchId, String winningTeam) {
         List<PlayerScore> winningScores = playerScoreRepository.findByMatchIdAndTeam(matchId, winningTeam);
         winningScores.forEach(score -> score.setIsWinner(true));
         playerScoreRepository.saveAll(winningScores);
     }
+
     public Integer getNextRoundNumber(UUID matchId) {
         Integer maxRound = playerScoreRepository.findMaxRoundNumberByMatchId(matchId);
         return maxRound != null ? maxRound + 1 : 1;
     }
+
     @Transactional
     public void cancelMatchScores(UUID matchId) {
         playerScoreRepository.deleteByMatchId(matchId);
         roundHistoryRepository.deleteByMatchId(matchId);
     }
+
     public List<PlayerScore> getRoundsHistory(UUID matchId) {
         return playerScoreRepository.findByMatchIdOrderByRoundNumberAsc(matchId);
     }

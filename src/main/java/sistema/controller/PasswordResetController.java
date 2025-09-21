@@ -1,4 +1,5 @@
 package sistema.controller;
+
 import jakarta.validation.Valid;
 import lombok.Data;
 import org.springframework.stereotype.Controller;
@@ -11,17 +12,20 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import sistema.dto.PasswordResetRequestDto;
 import sistema.service.EmailService;
 import sistema.service.UserService;
+
 @Controller
 @Data
 @RequestMapping("/forgot-password")
 public class PasswordResetController {
     private final UserService userService;
     private final EmailService emailService;
+
     @GetMapping
     public String showForgotPasswordForm(Model model) {
         model.addAttribute("request", new PasswordResetRequestDto());
         return "forgot-password";
     }
+
     @PostMapping
     public String processForgotPassword(@Valid @ModelAttribute("request") PasswordResetRequestDto request,
                                         BindingResult result,

@@ -804,3 +804,126 @@ cursor: pointer;
     box-sizing: border-box;
     margin-top: auto;
 }
+@media (max-width: 576px) {
+            .avatar-modal .modal-dialog { margin: 10px; }
+            .crop-controls { flex-wrap: wrap; }
+            .avatar-bottom-sheet { padding: 20px; }
+        }
+        .form-control[readonly] {
+            background-color: #f8f9fa;
+            opacity: 1;
+        }
+        .upload-btn-wrapper {
+            position: relative;
+            overflow: hidden;
+            display: inline-block;
+            margin: 10px 0;
+        }
+        .upload-btn-wrapper .btn {
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: 500;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            transition: all 0.3s;
+        }
+        .upload-btn-wrapper .btn:hover {
+            background-color: #0069d9;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .upload-btn-wrapper input[type=file] {
+            position: absolute;
+            left: 0;
+            top: 0;
+            opacity: 0;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+        }
+        .password-feedback {
+            display: none;
+            font-size: 0.875rem;
+            margin-top: 0.25rem;
+        }
+        .password-match { color: #28a745; }
+        .password-mismatch { color: #dc3545; }
+        .user-icon {
+            font-size: 3rem;
+            color: #007bff;
+            cursor: pointer;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+            background-size: cover;
+            background-position: center;
+        }
+        .avatar-preview {
+            width: 150px;
+            height: 150px;
+            object-fit: cover;
+            border: 3px solid #dee2e6;
+            border-radius: 50%;
+        }
+        .avatar-edit-btn {
+            bottom: 10px;
+            right: 10px;
+            cursor: pointer;
+            z-index: 1000;
+        }
+        .cropper-container {
+            max-height: 400px;
+            overflow: hidden;
+            margin: 15px 0;
+            border-radius: 8px;
+            border: 1px solid #dee2e6;
+        }
+        .crop-controls {
+            margin: 15px 0;
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+        }
+        .crop-controls .btn {
+            width: 40px;
+            height: 40px;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+        }
+        .avatar-bottom-sheet {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            border-radius: 20px 20px 0 0;
+            padding: 25px;
+            z-index: 1050;
+            transform: translateY(100%);
+            transition: transform 0.3s ease-out;
+            box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.15);
+            max-height: 85vh;
+            overflow-y: auto;
+        }
+        .avatar-bottom-sheet.show { transform: translateY(0); }
+        .avatar-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1040;
+            display: none;
+            animation: fadeIn 0.3s ease-out;
+        }
+        .avatar-overlay.show { display: block; }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
