@@ -17,7 +17,8 @@
     </div>
     <div class="buttons">
         <div sec:authorize="isAuthenticated()" class="user-dropdown">
-            <i class="fas fa-user-circle user-icon" id="headerUserIcon"></i>
+            <i class="fas fa-user-circle user-icon" id="userAvatarIcon"
+               th:attr="data-avatar=${#authentication.principal.avatar}"></i>
             <div class="dropdown-content">
                 <div class="user-name" th:text="${#authentication.principal.nickname}"></div>
                 <a th:href="@{/account}">Gerenciar conta</a>
@@ -166,5 +167,6 @@
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
 <script th:src="@{/js/common.js}"></script>
+<script th:src="@{/js/userAvatar.js}"></script>
 </body>
 </html>

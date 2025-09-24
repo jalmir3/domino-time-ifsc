@@ -26,35 +26,6 @@ const DominoTime = {
         }
     },
 
-    initUserDropdown: function() {
-        const userIcons = document.querySelectorAll('.user-icon');
-        const dropdownContents = document.querySelectorAll('.dropdown-content');
-
-        userIcons.forEach(icon => {
-            icon.addEventListener('click', function(e) {
-                e.stopPropagation();
-                const dropdown = this.closest('.user-dropdown');
-                const content = dropdown.querySelector('.dropdown-content');
-
-                dropdownContents.forEach(dc => {
-                    if (dc !== content) {
-                        dc.style.display = 'none';
-                    }
-                });
-
-                content.style.display = content.style.display === 'block' ? 'none' : 'block';
-            });
-        });
-
-        document.addEventListener('click', function(e) {
-            if (!e.target.closest('.user-dropdown')) {
-                dropdownContents.forEach(content => {
-                    content.style.display = 'none';
-                });
-            }
-        });
-    },
-
     initCopyButton: function() {
         const copyBtn = document.getElementById('copyAccessCodeBtn');
         const accessCodeInput = document.getElementById('accessCodeInput');
@@ -247,7 +218,7 @@ const AccountPage = {
     },
 
     updateHeaderAvatar: function(avatarData) {
-        const headerIcon = document.getElementById('headerUserIcon');
+        const headerIcon = document.getElementById('userAvatarIcon');
         const avatarPreview = document.getElementById('avatarPreview');
 
         if (headerIcon && avatarData) {
@@ -268,7 +239,7 @@ const AccountPage = {
     loadCachedAvatar: function() {
         const cachedAvatar = localStorage.getItem('userAvatar');
         const cachedTS = localStorage.getItem('userAvatarTS');
-        const headerIcon = document.getElementById('headerUserIcon');
+        const headerIcon = document.getElementById('userAvatarIcon');
         const avatarPreview = document.getElementById('avatarPreview');
 
         if (cachedAvatar) {
@@ -283,7 +254,7 @@ const AccountPage = {
             return;
         }
 
-        const headerUserIconElem = document.getElementById('headerUserIcon');
+        const headerUserIconElem = document.getElementById('userAvatarIcon');
         const currentAvatar = headerUserIconElem ? headerUserIconElem.getAttribute('data-avatar') : null;
         if (currentAvatar) {
             this.updateHeaderAvatar(currentAvatar);
@@ -595,17 +566,6 @@ const ConfigureMatchPage = {
         });
 
         $('#configForm').submit(this.handleFormSubmit.bind(this));
-
-        $('.user-icon').click(function(e) {
-            e.stopPropagation();
-            const dropdownContent = $(this).closest('.user-dropdown').find('.dropdown-content');
-            $('.dropdown-content').not(dropdownContent).hide();
-            dropdownContent.toggle();
-        });
-
-        $(document).click(function() {
-            $('.dropdown-content').hide();
-        });
     },
 
     showError: function(message, duration = 5000) {
@@ -725,7 +685,6 @@ const ScoreFormPage = {
     gameMode: 'INDIVIDUAL',
 
     init: function() {
-        DominoTime.initUserDropdown();
 
         const matchIdElement = document.getElementById('matchId');
         if (matchIdElement) {

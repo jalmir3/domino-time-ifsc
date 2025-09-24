@@ -43,24 +43,26 @@
     <div class="left-box">
         <div class="title">QUER JOGAR DOMINÓ?</div>
         <div class="subtitle">Marque sua partida agora e entre no jogo!</div>
-        <h2 class="ranking-title">Top 10 Jogadores</h2>
-        <div class="table-responsive">
-            <table class="ranking-table">
-                <thead>
-                    <tr>
-                        <th>Posição</th>
-                        <th>Jogador</th>
-                        <th>Pontuação</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr th:each="player : ${topPlayers}">
-                        <td class="position" th:text="${player.position}">1</td>
-                        <td class="nickname" th:text="${player.nickname}">Jogador</td>
-                        <td class="score" th:text="${player.totalScore}">1000</td>
-                    </tr>
-                </tbody>
-            </table>
+        <div th:if="${topPlayers != null and #lists.size(topPlayers) > 0}">
+            <h2 class="ranking-title">Top 10 Jogadores</h2>
+            <div class="table-responsive">
+                <table class="ranking-table">
+                    <thead>
+                        <tr>
+                            <th>Posição</th>
+                            <th>Jogador</th>
+                            <th>Pontuação</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="player : ${topPlayers}">
+                            <td class="position" th:text="${player.position}">1</td>
+                            <td class="nickname" th:text="${player.nickname}">Jogador</td>
+                            <td class="score" th:text="${player.totalScore}">1000</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 </div>
