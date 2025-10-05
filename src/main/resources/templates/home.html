@@ -44,7 +44,7 @@
         <div class="title">QUER JOGAR DOMINÓ?</div>
         <div class="subtitle">Marque sua partida agora e entre no jogo!</div>
         <div th:if="${topPlayers != null and #lists.size(topPlayers) > 0}">
-            <h2 class="ranking-title">Top 10 Jogadores</h2>
+            <h2 class="ranking-title">Top <span th:text="${#lists.size(topPlayers)}">10</span> Jogadores</h2>
             <div class="table-responsive">
                 <table class="ranking-table">
                     <thead>

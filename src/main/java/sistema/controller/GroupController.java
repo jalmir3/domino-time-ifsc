@@ -1,6 +1,8 @@
 package sistema.controller;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -18,14 +20,19 @@ import sistema.service.GroupService;
 import sistema.service.MatchService;
 import sistema.service.UserService;
 
-import java.nio.file.AccessDeniedException;
 import java.util.*;
 import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/groups")
 @RequiredArgsConstructor
+@Slf4j
 public class GroupController {
+    private static final String USER_NOT_FOUND_MESSAGE = "Usuário não encontrado";
+    private static final String SUCCESS_ATTR = "success";
+    private static final String ERROR_ATTR = "error";
+    private static final String REDIRECT_GROUPS_PREFIX = "redirect:/groups/";
+
     private final GameGroupService gameGroupService;
     private final GroupService groupService;
     private final UserService userService;
@@ -48,12 +55,12 @@ public class GroupController {
             RedirectAttributes redirectAttributes) {
         try {
             User creator = userService.findByEmail(userDetails.getUsername())
-                    .orElseThrow(() -> new NotFoundException("Usuário não encontrado"));
+                    .orElseThrow(() -> new NotFoundException(USER_NOT_FOUND_MESSAGE));
             GameGroup group = gameGroupService.createGroup(creator, name);
-            redirectAttributes.addFlashAttribute("success", "Grupo criado com sucesso!");
-            return "redirect:/groups/" + group.getAccessCode();
+            redirectAttributes.addFlashAttribute(SUCCESS_ATTR, "Grupo criado com sucesso!");
+            return REDIRECT_GROUPS_PREFIX + group.getAccessCode();
         } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("error", "Erro ao criar grupo: " + e.getMessage());
+            redirectAttributes.addFlashAttribute(ERROR_ATTR, "Erro ao criar grupo: " + e.getMessage());
             return "redirect:/groups/create";
         }
     }
@@ -64,7 +71,7 @@ public class GroupController {
             @AuthenticationPrincipal UserDetails userDetails,
             Model model) {
         User currentUser = userService.findByEmail(userDetails.getUsername())
-                .orElseThrow(() -> new NotFoundException("Usuário não encontrado"));
+                .orElseThrow(() -> new NotFoundException(USER_NOT_FOUND_MESSAGE));
         GameGroup group = groupService.findByAccessCode(accessCode);
         boolean isCreator = group.getCreatedBy().getId().equals(currentUser.getId());
         model.addAttribute("group", group);
@@ -83,7 +90,7 @@ public class GroupController {
             @AuthenticationPrincipal UserDetails userDetails,
             RedirectAttributes redirectAttributes) {
         User creator = userService.findByEmail(userDetails.getUsername())
-                .orElseThrow(() -> new NotFoundException("Usuário não encontrado"));
+                .orElseThrow(() -> new NotFoundException(USER_NOT_FOUND_MESSAGE));
         GameGroup group = groupService.findByAccessCode(accessCode);
         try {
             Match match = matchService.startConfiguredMatch(
@@ -92,11 +99,11 @@ public class GroupController {
                     gameMode,
                     teamA,
                     teamB);
-            redirectAttributes.addFlashAttribute("success", "Partida iniciada com sucesso!");
+            redirectAttributes.addFlashAttribute(SUCCESS_ATTR, "Partida iniciada com sucesso!");
             return "redirect:/matches/" + match.getId() + "/score";
         } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("error", e.getMessage());
-            return "redirect:/groups/" + accessCode + "/configure";
+            redirectAttributes.addFlashAttribute(ERROR_ATTR, e.getMessage());
+            return REDIRECT_GROUPS_PREFIX + accessCode + "/configure";
         }
     }
 
@@ -107,15 +114,15 @@ public class GroupController {
             RedirectAttributes redirectAttributes) {
         try {
             User user = userService.findByEmail(userDetails.getUsername())
-                    .orElseThrow(() -> new UsernameNotFoundException("Usuário não encontrado"));
+                    .orElseThrow(() -> new UsernameNotFoundException(USER_NOT_FOUND_MESSAGE));
             gameGroupService.addPlayerToGroup(user.getId(), accessCode);
-            redirectAttributes.addFlashAttribute("success", "Você entrou no grupo com sucesso!");
-            return "redirect:/groups/" + accessCode;
+            redirectAttributes.addFlashAttribute(SUCCESS_ATTR, "Você entrou no grupo com sucesso!");
+            return REDIRECT_GROUPS_PREFIX + accessCode;
         } catch (IllegalArgumentException | IllegalStateException e) {
-            redirectAttributes.addFlashAttribute("error", e.getMessage());
+            redirectAttributes.addFlashAttribute(ERROR_ATTR, e.getMessage());
         } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("error", "Ocorreu um erro ao entrar na partida");
-            e.printStackTrace();
+            redirectAttributes.addFlashAttribute(ERROR_ATTR, "Ocorreu um erro ao entrar na partida");
+            log.error("Erro ao entrar na partida", e);
         }
         redirectAttributes.addFlashAttribute("accessCode", accessCode);
         return "redirect:/groups/join";
@@ -127,10 +134,10 @@ public class GroupController {
             @AuthenticationPrincipal UserDetails userDetails,
             Model model) {
         User currentUser = userService.findByEmail(userDetails.getUsername())
-                .orElseThrow(() -> new NotFoundException("Usuário não encontrado"));
+                .orElseThrow(() -> new NotFoundException(USER_NOT_FOUND_MESSAGE));
         GameGroup group = groupService.findByAccessCode(accessCode);
         if (!group.getCreatedBy().getId().equals(currentUser.getId())) {
-            throw new IllegalArgumentException("Apenas o criador pode configurar a partida");
+            throw new AccessDeniedException("Apenas o criador pode configurar a partida");
         }
         List<User> players = gameGroupService.getPlayersInGroup(group.getId());
         model.addAttribute("group", group);
@@ -150,7 +157,7 @@ public class GroupController {
             RedirectAttributes redirectAttributes) {
         try {
             User creator = userService.findByEmail(userDetails.getUsername())
-                    .orElseThrow(() -> new NotFoundException("Usuário não encontrado"));
+                    .orElseThrow(() -> new NotFoundException(USER_NOT_FOUND_MESSAGE));
             GameGroup group = groupService.findByAccessCode(accessCode);
             if (!group.getCreatedBy().getId().equals(creator.getId())) {
                 throw new AccessDeniedException("Apenas o criador pode iniciar partidas");
@@ -179,11 +186,11 @@ public class GroupController {
                 gameGroupService.saveTeams(group.getId(), teamA, teamB);
             }
             Match newMatch = matchService.startConfiguredMatch(group, creator, gameMode, teamA, teamB);
-            redirectAttributes.addFlashAttribute("success", "Partida iniciada com sucesso!");
+            redirectAttributes.addFlashAttribute(SUCCESS_ATTR, "Partida iniciada com sucesso!");
             return "redirect:/matches/" + newMatch.getId() + "/score";
         } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("error", e.getMessage());
-            return "redirect:/groups/" + accessCode + "/configure";
+            redirectAttributes.addFlashAttribute(ERROR_ATTR, e.getMessage());
+            return REDIRECT_GROUPS_PREFIX + accessCode + "/configure";
         }
     }
 }
