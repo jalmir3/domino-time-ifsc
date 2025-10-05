@@ -15,13 +15,14 @@ public class MatchDetailsDTO {
     private GameMode gameMode;
     private String winner;
     private List<PlayerDetailDTO> players;
+    private UUID currentUserId;
 
     @Data
     public static class PlayerDetailDTO {
+        private UUID userId;
         private String nickname;
         private Integer score;
         private String team;
         private boolean isWinner;
     }
 }
-

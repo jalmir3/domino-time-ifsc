@@ -1023,9 +1023,11 @@ const MatchDetailsPage = {
             `;
 
             teamA.forEach(player => {
+                const isCurrentUser = player.userId === data.currentUserId;
+                const playerNameClass = isCurrentUser ? 'font-weight-bold text-primary' : '';
                 content += `
                     <tr ${player.winner ? 'class="table-success"' : ''}>
-                        <td>${player.nickname}</td>
+                        <td class="${playerNameClass}">${player.nickname}${isCurrentUser ? ' (Você)' : ''}</td>
                         <td>${player.score} pontos</td>
                         <td>
                             ${player.winner
@@ -1052,9 +1054,11 @@ const MatchDetailsPage = {
             `;
 
             teamB.forEach(player => {
+                const isCurrentUser = player.userId === data.currentUserId;
+                const playerNameClass = isCurrentUser ? 'font-weight-bold text-primary' : '';
                 content += `
                     <tr ${player.winner ? 'class="table-success"' : ''}>
-                        <td>${player.nickname}</td>
+                        <td class="${playerNameClass}">${player.nickname}${isCurrentUser ? ' (Você)' : ''}</td>
                         <td>${player.score} pontos</td>
                         <td>
                             ${player.winner
@@ -1085,9 +1089,11 @@ const MatchDetailsPage = {
             data.players.sort((a, b) => b.score - a.score);
 
             data.players.forEach(player => {
+                const isCurrentUser = player.userId === data.currentUserId;
+                const playerNameClass = isCurrentUser ? 'font-weight-bold text-primary' : '';
                 content += `
                     <tr ${player.winner ? 'class="table-success"' : ''}>
-                        <td>${player.nickname}</td>
+                        <td class="${playerNameClass}">${player.nickname}${isCurrentUser ? ' (Você)' : ''}</td>
                         <td>${player.score} pontos</td>
                         <td>
                             ${player.winner

@@ -224,6 +224,7 @@ public class PlayerScoreService {
         List<MatchDetailsDTO.PlayerDetailDTO> playerDetails = playerScores.stream()
                 .map(ps -> {
                     MatchDetailsDTO.PlayerDetailDTO playerDetail = new MatchDetailsDTO.PlayerDetailDTO();
+                    playerDetail.setUserId(ps.getUser().getId());
                     playerDetail.setNickname(ps.getUser().getNickname());
                     playerDetail.setScore(ps.getTotalScore());
                     playerDetail.setTeam(ps.getTeam());

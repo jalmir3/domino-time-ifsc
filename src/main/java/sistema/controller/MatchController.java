@@ -106,7 +106,12 @@ public class MatchController {
             @PathVariable("matchId") UUID matchId,
             @AuthenticationPrincipal UserDetails userDetails) {
         try {
+            User currentUser = userService.findByEmail(userDetails.getUsername())
+                    .orElseThrow(() -> new UsernameNotFoundException("Usuário não encontrado"));
+
             MatchDetailsDTO details = playerScoreService.getMatchDetails(matchId);
+            details.setCurrentUserId(currentUser.getId());
+
             return ResponseEntity.ok(details);
         } catch (NotFoundException e) {
             return ResponseEntity.notFound().build();
