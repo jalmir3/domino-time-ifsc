@@ -17,6 +17,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.webjars.NotFoundException;
+import sistema.dto.MatchDetailsDTO;
 import sistema.dto.PlayerMatchDTO;
 import sistema.dto.ScoreDTO;
 import sistema.model.*;
@@ -97,6 +98,22 @@ public class MatchController {
         model.addAttribute("matchesPage", matchesPage);
         model.addAttribute("totalPoints", totalPoints);
         return "user-matches";
+    }
+
+    @GetMapping("/{matchId}/details")
+    @ResponseBody
+    public ResponseEntity<MatchDetailsDTO> getMatchDetails(
+            @PathVariable("matchId") UUID matchId,
+            @AuthenticationPrincipal UserDetails userDetails) {
+        try {
+            MatchDetailsDTO details = playerScoreService.getMatchDetails(matchId);
+            return ResponseEntity.ok(details);
+        } catch (NotFoundException e) {
+            return ResponseEntity.notFound().build();
+        } catch (Exception e) {
+            log.error("Erro ao buscar detalhes da partida", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 
     @GetMapping("/{matchId}/score")

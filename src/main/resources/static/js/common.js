@@ -50,6 +50,24 @@ const DominoTime = {
                 }
             });
         }
+    },
+
+    initUserDropdown: function() {
+        const userIcon = document.getElementById('userAvatarIcon');
+        const dropdownContent = document.querySelector('.user-dropdown .dropdown-content');
+
+        if (userIcon && dropdownContent) {
+            userIcon.addEventListener('click', function(e) {
+                e.stopPropagation();
+                dropdownContent.classList.toggle('show');
+            });
+
+            document.addEventListener('click', function(e) {
+                if (!e.target.closest('.user-dropdown')) {
+                    dropdownContent.classList.remove('show');
+                }
+            });
+        }
     }
 };
 
@@ -821,6 +839,272 @@ const ScoreFormPage = {
 const UserMatchesPage = {
     init: function() {
         DominoTime.initUserDropdown();
+        MatchDetailsPage.init();
+    }
+};
+
+const MatchDetailsPage = {
+    isMobile: window.innerWidth <= 768,
+
+    init: function() {
+        this.checkMobile();
+        window.addEventListener('resize', this.checkMobile.bind(this));
+
+        if (typeof $ !== 'undefined') {
+            this.setupEventListeners();
+        } else {
+            setTimeout(() => this.setupEventListeners(), 100);
+        }
+    },
+
+    checkMobile: function() {
+        this.isMobile = window.innerWidth <= 768;
+    },
+
+    setupEventListeners: function() {
+        const detailButtons = document.querySelectorAll('.btn-match-details');
+
+        detailButtons.forEach(button => {
+            button.addEventListener('click', (e) => {
+                e.preventDefault();
+                const matchId = button.getAttribute('data-match-id');
+                this.showMatchDetails(matchId);
+            });
+        });
+
+        const closeBottomSheet = document.getElementById('closeMatchDetailsBottomSheet');
+        if (closeBottomSheet) {
+            closeBottomSheet.addEventListener('click', this.closeBottomSheet.bind(this));
+        }
+
+        const cancelButton = document.getElementById('cancelMatchDetailsMobile');
+        if (cancelButton) {
+            cancelButton.addEventListener('click', this.closeBottomSheet.bind(this));
+        }
+
+        const overlay = document.getElementById('matchDetailsOverlay');
+        if (overlay) {
+            overlay.addEventListener('click', this.closeBottomSheet.bind(this));
+        }
+    },
+
+    showMatchDetails: function(matchId) {
+        if (this.isMobile) {
+            this.showLoadingBottomSheet();
+        } else {
+            this.showLoadingModal();
+        }
+
+        fetch(`/matches/${matchId}/details`)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Erro ao carregar detalhes da partida');
+                }
+                return response.json();
+            })
+            .then(data => {
+                this.displayMatchDetails(data);
+            })
+            .catch(error => {
+                if (this.isMobile) {
+                    this.closeBottomSheet();
+                } else {
+                    if (typeof $ !== 'undefined') {
+                        $('#matchDetailsModal').modal('hide');
+                    }
+                }
+                alert('Não foi possível carregar os detalhes da partida.');
+            });
+    },
+
+    showLoadingModal: function() {
+        const modalBody = document.getElementById('matchDetailsBody');
+        if (modalBody) {
+            modalBody.innerHTML = `
+                <div class="text-center py-4">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="sr-only">Carregando...</span>
+                    </div>
+                </div>
+            `;
+        }
+
+        if (typeof $ !== 'undefined') {
+            $('#matchDetailsModal').modal('show');
+        }
+    },
+
+    showLoadingBottomSheet: function() {
+        const sheetBody = document.getElementById('matchDetailsBodyMobile');
+        if (sheetBody) {
+            sheetBody.innerHTML = `
+                <div class="text-center py-4">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="sr-only">Carregando...</span>
+                    </div>
+                </div>
+            `;
+        }
+        this.openBottomSheet();
+    },
+
+    openBottomSheet: function() {
+        const overlay = document.getElementById('matchDetailsOverlay');
+        const sheet = document.getElementById('matchDetailsBottomSheet');
+
+        if (overlay && sheet) {
+            overlay.classList.add('show');
+            sheet.classList.add('show');
+        }
+    },
+
+    closeBottomSheet: function() {
+        const overlay = document.getElementById('matchDetailsOverlay');
+        const sheet = document.getElementById('matchDetailsBottomSheet');
+
+        if (overlay && sheet) {
+            overlay.classList.remove('show');
+            sheet.classList.remove('show');
+        }
+    },
+
+    displayMatchDetails: function(data) {
+        const content = this.buildDetailsContent(data);
+
+        if (this.isMobile) {
+            const modalTitle = document.getElementById('matchDetailsTitleMobile');
+            const modalBody = document.getElementById('matchDetailsBodyMobile');
+
+            if (modalTitle) {
+                modalTitle.innerHTML = `${data.groupName}`;
+            }
+            if (modalBody) {
+                modalBody.innerHTML = content;
+            }
+        } else {
+            const modalTitle = document.getElementById('matchDetailsTitle');
+            const modalBody = document.getElementById('matchDetailsBody');
+
+            if (modalTitle) {
+                modalTitle.innerHTML = `Detalhes da Partida - ${data.groupName}`;
+            }
+            if (modalBody) {
+                modalBody.innerHTML = content;
+            }
+
+            if (typeof $ !== 'undefined') {
+                $('#matchDetailsModal').modal('show');
+            }
+        }
+    },
+
+    buildDetailsContent: function(data) {
+        let content = `
+            <div class="match-info mb-3">
+                <p><strong>Modo de Jogo:</strong> ${data.gameMode === 'TEAMS' ? 'Duplas' : 'Individual'}</p>
+            </div>
+        `;
+
+        if (data.gameMode === 'TEAMS') {
+            const teamA = data.players.filter(p => p.team === 'A');
+            const teamB = data.players.filter(p => p.team === 'B');
+
+            content += `
+                <h5 class="mt-3 mb-2">Time A</h5>
+                <table class="table table-bordered table-sm mb-3">
+                    <thead class="thead-light">
+                        <tr>
+                            <th>Jogador</th>
+                            <th>Pontuação</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+
+            teamA.forEach(player => {
+                content += `
+                    <tr ${player.winner ? 'class="table-success"' : ''}>
+                        <td>${player.nickname}</td>
+                        <td>${player.score} pontos</td>
+                        <td>
+                            ${player.winner
+                                ? '<span class="badge badge-success">VENCEDOR</span>'
+                                : '<span class="badge badge-secondary">PARTICIPANTE</span>'}
+                        </td>
+                    </tr>
+                `;
+            });
+
+            content += `
+                    </tbody>
+                </table>
+                <h5 class="mt-3 mb-2">Time B</h5>
+                <table class="table table-bordered table-sm">
+                    <thead class="thead-light">
+                        <tr>
+                            <th>Jogador</th>
+                            <th>Pontuação</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+
+            teamB.forEach(player => {
+                content += `
+                    <tr ${player.winner ? 'class="table-success"' : ''}>
+                        <td>${player.nickname}</td>
+                        <td>${player.score} pontos</td>
+                        <td>
+                            ${player.winner
+                                ? '<span class="badge badge-success">VENCEDOR</span>'
+                                : '<span class="badge badge-secondary">PARTICIPANTE</span>'}
+                        </td>
+                    </tr>
+                `;
+            });
+
+            content += `
+                    </tbody>
+                </table>
+            `;
+        } else {
+            content += `
+                <table class="table table-bordered table-sm">
+                    <thead class="thead-light">
+                        <tr>
+                            <th>Jogador</th>
+                            <th>Pontuação</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+
+            data.players.sort((a, b) => b.score - a.score);
+
+            data.players.forEach(player => {
+                content += `
+                    <tr ${player.winner ? 'class="table-success"' : ''}>
+                        <td>${player.nickname}</td>
+                        <td>${player.score} pontos</td>
+                        <td>
+                            ${player.winner
+                                ? '<span class="badge badge-success">VENCEDOR</span>'
+                                : '<span class="badge badge-secondary">PARTICIPANTE</span>'}
+                        </td>
+                    </tr>
+                `;
+            });
+
+            content += `
+                    </tbody>
+                </table>
+            `;
+        }
+
+        return content;
     }
 };
 
