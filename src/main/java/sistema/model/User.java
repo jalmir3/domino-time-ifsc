@@ -16,8 +16,6 @@ import java.util.UUID;
 @Table(name = "users")
 @Data
 @NoArgsConstructor
-@SQLDelete(sql = "UPDATE users SET deleted = true, deleted_at = NOW() WHERE id = ?")
-@Where(clause = "deleted = false")
 public class User {
     @Id
     @GeneratedValue(generator = "UUID")
@@ -48,8 +46,6 @@ public class User {
     private LocalDateTime passwordResetExpiry;
     @Column(name = "avatar", columnDefinition = "TEXT")
     private String avatar;
-    @Column(name = "deleted")
-    private boolean deleted = false;
     @Column(name = "deleted_at")
     private LocalDateTime deletedAt;
 }
