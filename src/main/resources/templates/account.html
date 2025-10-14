@@ -97,6 +97,113 @@
             <button type="submit" class="btn btn-danger btn-block">Sair da Conta</button>
         </form>
     </div>
+    <div class="form-group">
+        <button type="button" class="btn btn-outline-danger btn-block" onclick="openDeleteAccountModal()">
+            <i class="fas fa-trash-alt"></i> Deletar Conta
+        </button>
+    </div>
+</div>
+<div class="modal fade" id="deleteAccountModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title">
+                    <i class="fas fa-exclamation-triangle"></i> Deletar Conta
+                </h5>
+                <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-warning">
+                    <i class="fas fa-warning"></i>
+                    <strong>Atenção:</strong> Esta ação é irreversível!
+                </div>
+                <p>Ao deletar sua conta:</p>
+                <ul>
+                    <li>Você perderá acesso a todas as suas partidas e histórico</li>
+                    <li>Não será possível recuperar os dados da conta</li>
+                    <li>Para usar o sistema novamente, será necessário criar uma nova conta</li>
+                </ul>
+
+                <form id="deleteAccountForm" th:action="@{/account/delete}" method="post">
+                    <div class="form-group">
+                        <div class="custom-control custom-checkbox">
+                            <input type="checkbox" class="custom-control-input" id="confirmDeleteCheckbox"
+                                   onchange="toggleDeleteButton()">
+                            <label class="custom-control-label" for="confirmDeleteCheckbox">
+                                Li e estou de acordo com a exclusão permanente da minha conta
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="deletePassword">Digite sua senha para confirmar:</label>
+                        <input type="password" class="form-control" id="deletePassword" name="password"
+                               placeholder="Senha atual" required>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-danger" id="confirmDeleteBtn"
+                        onclick="confirmDeleteAccount()" disabled>
+                    <i class="fas fa-trash-alt"></i> Deletar Conta
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="delete-account-overlay" id="deleteAccountOverlay"></div>
+<div class="delete-account-bottom-sheet" id="deleteAccountBottomSheet">
+    <div class="sheet-header">
+        <h5 class="sheet-title">
+            <i class="fas fa-exclamation-triangle"></i> Deletar Conta
+        </h5>
+        <button type="button" class="close-btn" onclick="closeDeleteAccountBottomSheet()">
+            <i class="fas fa-times"></i>
+        </button>
+    </div>
+    <div class="sheet-content">
+        <div class="alert alert-warning">
+            <i class="fas fa-warning"></i>
+            <strong>Atenção:</strong> Esta ação é irreversível!
+        </div>
+        <p>Ao deletar sua conta:</p>
+        <ul>
+            <li>Você perderá acesso a todas as suas partidas e histórico</li>
+            <li>Não será possível recuperar os dados da conta</li>
+            <li>Para usar o sistema novamente, será necessário criar uma nova conta</li>
+        </ul>
+
+        <form id="deleteAccountFormMobile" th:action="@{/account/delete}" method="post">
+            <div class="form-group">
+                <div class="custom-control custom-checkbox">
+                    <input type="checkbox" class="custom-control-input" id="confirmDeleteCheckboxMobile"
+                           onchange="toggleDeleteButtonMobile()">
+                    <label class="custom-control-label" for="confirmDeleteCheckboxMobile">
+                        Li e estou de acordo com a exclusão permanente da minha conta
+                    </label>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="deletePasswordMobile">Digite sua senha para confirmar:</label>
+                <input type="password" class="form-control" id="deletePasswordMobile" name="password"
+                       placeholder="Senha atual" required>
+            </div>
+        </form>
+
+        <div class="d-grid gap-2">
+            <button type="button" class="btn btn-danger" id="confirmDeleteBtnMobile"
+                    onclick="confirmDeleteAccountMobile()" disabled>
+                <i class="fas fa-trash-alt"></i> Deletar Conta
+            </button>
+            <button type="button" class="btn btn-secondary" onclick="closeDeleteAccountBottomSheet()">
+                Cancelar
+            </button>
+        </div>
+    </div>
 </div>
 <div class="modal fade avatar-modal" id="avatarModal" tabindex="-1" role="dialog" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" role="document">

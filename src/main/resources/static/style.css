@@ -495,9 +495,11 @@ body {
 .modal {
     z-index: 1600 !important;
 }
+
 .modal-backdrop {
     z-index: 1550 !important;
 }
+
 .modal-dialog {
     margin-top: 80px;
 }
@@ -506,6 +508,7 @@ body {
     margin-top: 80px;
     margin-bottom: 80px;
 }
+
 .cropper-container {
     max-height: 400px;
     overflow: hidden;
@@ -807,16 +810,118 @@ body {
     opacity: 1;
 }
 
-/* ===== CROP CONTROLS - DIFERENTE (comentário para avaliação) ===== */
-/* Versão original tinha border-radius: 20px e padding: 6px 12px */
-/* .crop-controls .btn {
-    border-radius: 20px;
-    padding: 6px 12px;
-    font-size: 14px;
-} */
+/* ===== ESTILOS PARA MODAIS E BOTTOM SHEETS ===== */
 
-/* ===== MEDIA QUERIES ===== */
+/* Estilos para headers de modais */
+.modal-header.bg-primary-custom {
+    background-color: #4aa2dd !important;
+    color: white;
+    border-bottom: 1px solid #dee2e6;
+}
 
+.modal-header.bg-primary-custom .modal-title {
+    color: white;
+    font-weight: 600;
+}
+
+.modal-header.bg-primary-custom .close {
+    color: white;
+    opacity: 1;
+}
+
+.modal-header.bg-primary-custom .close:hover {
+    color: rgba(255, 255, 255, 0.8);
+}
+
+/* Overlay para modais */
+.delete-account-overlay,
+.avatar-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1550;
+    display: none;
+    animation: fadeIn 0.3s ease-out;
+}
+
+/* Bottom sheets base */
+.delete-account-bottom-sheet {
+    display: none;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: white;
+    border-radius: 20px 20px 0 0;
+    max-height: 80vh;
+    z-index: 1600;
+    transform: translateY(100%);
+    transition: transform 0.3s ease-in-out;
+    overflow: hidden;
+    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.15);
+}
+
+.delete-account-bottom-sheet.show{
+    transform: translateY(0);
+}
+
+/* Headers padronizados */
+.sheet-header {
+    padding: 1rem;
+    border-bottom: 1px solid #dee2e6;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #4aa2dd;
+    color: white;
+    border-radius: 20px 20px 0 0;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.sheet-title {
+    margin: 0;
+    font-size: 1.25rem;
+    color: white;
+    font-weight: 600;
+}
+
+.close-btn {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: white;
+    padding: 0;
+    line-height: 1;
+}
+
+.close-btn:hover {
+    color: rgba(255, 255, 255, 0.8);
+}
+
+/* Conteúdo scrollável */
+.sheet-content,
+.sheet-body {
+    padding: 1rem;
+    overflow-y: auto;
+    max-height: calc(80vh - 80px);
+}
+
+/* Botões fixos no rodapé dos bottom sheets */
+.sheet-content .d-grid,
+.sheet-body .d-grid {
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid #e9ecef;
+    position: sticky;
+    bottom: 0;
+    background: white;
+}
 @media (min-width: 577px) {
     .container {
         max-width: 1200px;
@@ -946,6 +1051,22 @@ body {
     }
     .avatar-bottom-sheet {
         padding: 20px;
+    }
+    #deleteAccountModal,
+    #matchDetailsModal {
+        display: none !important;
+    }
+}
+
+@media (min-width: 577px) {
+    .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 20px 80px 20px;
+    }
+    .card {
+        margin: 20px auto;
+        max-width: 1000px;
     }
 }
 
