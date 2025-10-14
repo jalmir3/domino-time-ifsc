@@ -1160,3 +1160,60 @@ window.openAvatarEditor = function() {
         AccountPage.openAvatarEditor();
     }
 };
+
+window.openDeleteAccountModal = function() {
+    if (window.innerWidth <= 768) {
+        document.getElementById('deleteAccountOverlay').style.display = 'block';
+        document.getElementById('deleteAccountBottomSheet').style.display = 'block';
+        setTimeout(() => {
+            document.getElementById('deleteAccountBottomSheet').classList.add('show');
+        }, 10);
+    } else {
+        $('#deleteAccountModal').modal('show');
+    }
+};
+
+window.closeDeleteAccountBottomSheet = function() {
+    document.getElementById('deleteAccountBottomSheet').classList.remove('show');
+    setTimeout(() => {
+        document.getElementById('deleteAccountBottomSheet').style.display = 'none';
+        document.getElementById('deleteAccountOverlay').style.display = 'none';
+    }, 300);
+};
+
+window.toggleDeleteButton = function() {
+    const checkbox = document.getElementById('confirmDeleteCheckbox');
+    const button = document.getElementById('confirmDeleteBtn');
+    button.disabled = !checkbox.checked;
+};
+
+window.toggleDeleteButtonMobile = function() {
+    const checkbox = document.getElementById('confirmDeleteCheckboxMobile');
+    const button = document.getElementById('confirmDeleteBtnMobile');
+    button.disabled = !checkbox.checked;
+};
+
+window.confirmDeleteAccount = function() {
+    const password = document.getElementById('deletePassword').value;
+    if (!password) {
+        alert('Por favor, digite sua senha para confirmar.');
+        return;
+    }
+    document.getElementById('deleteAccountForm').submit();
+};
+
+window.confirmDeleteAccountMobile = function() {
+    const password = document.getElementById('deletePasswordMobile').value;
+    if (!password) {
+        alert('Por favor, digite sua senha para confirmar.');
+        return;
+    }
+    document.getElementById('deleteAccountFormMobile').submit();
+};
+
+document.addEventListener('DOMContentLoaded', function() {
+    const deleteAccountOverlay = document.getElementById('deleteAccountOverlay');
+    if (deleteAccountOverlay) {
+        deleteAccountOverlay.addEventListener('click', window.closeDeleteAccountBottomSheet);
+    }
+});
