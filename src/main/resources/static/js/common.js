@@ -980,6 +980,10 @@ const MatchDetailsPage = {
             }
             if (modalBody) {
                 modalBody.innerHTML = content;
+                const cancelBtn = document.getElementById('cancelMatchDetailsMobile');
+                if (cancelBtn) {
+                    cancelBtn.addEventListener('click', this.closeBottomSheet.bind(this));
+                }
             }
         } else {
             const modalTitle = document.getElementById('matchDetailsTitle');
@@ -1109,6 +1113,11 @@ const MatchDetailsPage = {
                 </table>
             `;
         }
+        content += `
+            <div class="d-grid gap-2 mt-3">
+                <button type="button" class="btn btn-secondary" id="cancelMatchDetailsMobile">Fechar</button>
+            </div>
+        `;
 
         return content;
     }

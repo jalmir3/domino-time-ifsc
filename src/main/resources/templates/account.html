@@ -13,7 +13,8 @@
 <body>
 <div class="header">
     <div class="logo">
-        <img th:onclick="|window.location.href='@{/home}'|" th:src="@{/images/logo.png}" alt="Logo" class="logo-img" id="headerLogo">
+        <img th:onclick="|window.location.href='@{/home}'|" th:src="@{/images/logo.png}" alt="Logo" class="logo-img"
+             id="headerLogo">
     </div>
     <div class="buttons">
         <div sec:authorize="isAuthenticated()" class="user-dropdown">
@@ -103,14 +104,12 @@
         </button>
     </div>
 </div>
-<div class="modal fade" id="deleteAccountModal" tabindex="-1" role="dialog" aria-hidden="true">
+<div class="modal fade avatar-modal" id="deleteAccountModal" tabindex="-1" role="dialog" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content">
-            <div class="modal-header bg-danger text-white">
-                <h5 class="modal-title">
-                    <i class="fas fa-exclamation-triangle"></i> Deletar Conta
-                </h5>
-                <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+            <div class="modal-header">
+                <h5 class="modal-title">Deletar Conta</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
@@ -157,9 +156,7 @@
 <div class="delete-account-overlay" id="deleteAccountOverlay"></div>
 <div class="delete-account-bottom-sheet" id="deleteAccountBottomSheet">
     <div class="sheet-header">
-        <h5 class="sheet-title">
-            <i class="fas fa-exclamation-triangle"></i> Deletar Conta
-        </h5>
+        <h5 class="sheet-title">Deletar Conta</h5>
         <button type="button" class="close-btn" onclick="closeDeleteAccountBottomSheet()">
             <i class="fas fa-times"></i>
         </button>
@@ -239,31 +236,33 @@
     </div>
 </div>
 <div class="avatar-overlay" id="avatarOverlay"></div>
-<div class="avatar-bottom-sheet" id="avatarBottomSheet">
+<div class="delete-account-bottom-sheet" id="avatarBottomSheet">
     <div class="sheet-header">
         <h5 class="sheet-title">Editar Foto de Perfil</h5>
         <button type="button" class="close-btn" id="closeBottomSheet">
             <i class="fas fa-times"></i>
         </button>
     </div>
-    <div class="alert alert-info">
-        <small>
-            <i class="fas fa-info-circle"></i> Formatos aceitos: JPG, JPEG, PNG. Tamanho máximo: 2MB.
-            A imagem será redimensionada para 150x150 pixels.
-        </small>
-    </div>
-    <div class="text-center mb-3">
-        <div class="upload-btn-wrapper">
-            <button class="btn"><i class="fas fa-upload"></i> Selecionar Imagem</button>
-            <input type="file" id="avatarUploadMobile" accept="image/jpeg,image/png,image/jpg">
+    <div class="sheet-content">
+        <div class="alert alert-info">
+            <small>
+                <i class="fas fa-info-circle"></i> Formatos aceitos: JPG, JPEG, PNG. Tamanho máximo: 2MB.
+                A imagem será redimensionada para 150x150 pixels.
+            </small>
         </div>
-    </div>
-    <div class="cropper-container mb-3" style="display: none;">
-        <img id="imageToCropMobile" class="img-fluid">
-    </div>
-    <div class="d-grid gap-2">
-        <button type="button" class="btn btn-primary" id="saveAvatarMobile" disabled>Salvar</button>
-        <button type="button" class="btn btn-danger" id="cancelAvatarMobile">Cancelar</button>
+        <div class="text-center mb-3">
+            <div class="upload-btn-wrapper">
+                <button class="btn"><i class="fas fa-upload"></i> Selecionar Imagem</button>
+                <input type="file" id="avatarUploadMobile" accept="image/jpeg,image/png,image/jpg">
+            </div>
+        </div>
+        <div class="cropper-container mb-3" style="display: none;">
+            <img id="imageToCropMobile" class="img-fluid">
+        </div>
+        <div class="d-grid gap-2">
+            <button type="button" class="btn btn-primary" id="saveAvatarMobile" disabled>Salvar</button>
+            <button type="button" class="btn btn-danger" id="cancelAvatarMobile">Cancelar</button>
+        </div>
     </div>
 </div>
 <div class="footer-bar">
