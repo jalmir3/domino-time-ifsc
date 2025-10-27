@@ -17,6 +17,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.webjars.NotFoundException;
+import sistema.dto.MatchDetailsDTO;
 import sistema.dto.PlayerMatchDTO;
 import sistema.dto.ScoreDTO;
 import sistema.model.*;
@@ -99,17 +100,23 @@ public class MatchController {
         return "user-matches";
     }
 
-    @GetMapping("/{matchId}/info")
+    @GetMapping("/{matchId}/details")
     @ResponseBody
-    public ResponseEntity<Map<String, Object>> getMatchInfo(@PathVariable("matchId") UUID matchId) {
+    public ResponseEntity<MatchDetailsDTO> getMatchDetails(
+            @PathVariable("matchId") UUID matchId,
+            @AuthenticationPrincipal UserDetails userDetails) {
         try {
-            Match match = matchService.findById(matchId)
-                    .orElseThrow(() -> new NotFoundException("Partida não encontrada"));
-            Map<String, Object> response = new HashMap<>();
-            response.put("gameMode", match.getGameMode());
-            response.put("status", match.getStatus());
-            return ResponseEntity.ok(response);
+            User currentUser = userService.findByEmail(userDetails.getUsername())
+                    .orElseThrow(() -> new UsernameNotFoundException("Usuário não encontrado"));
+
+            MatchDetailsDTO details = playerScoreService.getMatchDetails(matchId);
+            details.setCurrentUserId(currentUser.getId());
+
+            return ResponseEntity.ok(details);
+        } catch (NotFoundException e) {
+            return ResponseEntity.notFound().build();
         } catch (Exception e) {
+            log.error("Erro ao buscar detalhes da partida", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }

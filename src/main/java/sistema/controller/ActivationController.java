@@ -26,9 +26,4 @@ public class ActivationController {
             return "login";
         }
     }
-
-    @GetMapping("/success")
-    public String showActivationSuccessPage() {
-        return "activation-success";
-    }
 }

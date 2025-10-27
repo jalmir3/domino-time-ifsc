@@ -9,7 +9,8 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface UserRepository extends JpaRepository<User, Long> {
-    Optional<User> findByEmail(String email);
+    @Query("SELECT u FROM User u WHERE u.email = :email AND u.status != 'DELETED'")
+    Optional<User> findByEmail(@Param("email") String email);
 
     Optional<User> findByActivationToken(String activationToken);
 
@@ -17,9 +18,9 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     Optional<User> findById(UUID id);
 
-    @Query("SELECT u FROM User u WHERE u.email = :email")
+    @Query("SELECT u FROM User u WHERE u.email = :email AND u.status != 'DELETED'")
     Optional<User> findByEmailAndDeletedFalse(@Param("email") String email);
 
-    @Query("SELECT u FROM User u WHERE u.nickname = :nickname")
+    @Query("SELECT u FROM User u WHERE u.nickname = :nickname AND u.status != 'DELETED'")
     Optional<User> findByNicknameAndDeletedFalse(@Param("nickname") String nickname);
 }

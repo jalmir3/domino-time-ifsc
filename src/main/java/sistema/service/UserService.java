@@ -110,16 +110,17 @@ public class UserService {
     }
 
     @Transactional
-    public void softDeleteUser(UUID userId, String password) {
+    public void deleteUser(UUID userId, String password) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("Usuário não encontrado"));
         if (!passwordEncoder.matches(password, user.getPassword())) {
             throw new IllegalArgumentException("Senha incorreta");
         }
-        user.setDeleted(true);
-        user.setEmail("");
         user.setStatus(UserStatus.DELETED);
+        user.setEmail(user.getId() + "@deleted.com");
+        user.setNickname(user.getNickname()+"(deletado)");
         user.setDeletedAt(LocalDateTime.now());
+        user.setAvatar(null);
         userRepository.save(user);
         SecurityContextHolder.clearContext();
     }

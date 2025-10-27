@@ -47,58 +47,11 @@
     </form>
 </div>
 <div class="footer-bar">
-    Convide seus amigos e comece a marcar suas partidas de dominó agora mesmo!
+    Uma maneira fácil de usar para marcar sua pontuação do jogo de dominó em qualquer hora e lugar
 </div>
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-<script>
-document.getElementById('joinGameForm').addEventListener('submit', function(e) {
-    const submitBtn = document.getElementById('submitBtn');
-    const btnText = document.getElementById('btnText');
-    const btnLoader = document.getElementById('btnLoader');
-    btnText.textContent = 'Processando...';
-    btnLoader.classList.remove('d-none');
-    submitBtn.disabled = true;
-    setTimeout(() => {
-        btnText.textContent = 'Entrar';
-        btnLoader.classList.add('d-none');
-        submitBtn.disabled = false;
-    }, 10000);
-});
-document.addEventListener('DOMContentLoaded', function() {
-    const errorAlert = document.getElementById('errorAlert');
-    if (errorAlert) {
-        setTimeout(() => {
-            errorAlert.classList.add('fade');
-            setTimeout(() => errorAlert.remove(), 500);
-        }, 3000);
-    }
-});
-document.addEventListener('DOMContentLoaded', function() {
-    const userIcons = document.querySelectorAll('.user-icon');
-    const dropdownContents = document.querySelectorAll('.dropdown-content');
-    userIcons.forEach(icon => {
-        icon.addEventListener('click', function(e) {
-            e.stopPropagation();
-            const dropdown = this.closest('.user-dropdown');
-            const content = dropdown.querySelector('.dropdown-content');
-            dropdownContents.forEach(dc => {
-                if (dc !== content) {
-                    dc.style.display = 'none';
-                }
-            });
-            content.style.display = content.style.display === 'block' ? 'none' : 'block';
-        });
-    });
-    document.addEventListener('click', function(e) {
-        if (!e.target.closest('.user-dropdown')) {
-            dropdownContents.forEach(content => {
-                content.style.display = 'none';
-            });
-        }
-    });
-});
-</script>
+<script th:src="@{/js/common.js}"></script>
 </body>
 </html>

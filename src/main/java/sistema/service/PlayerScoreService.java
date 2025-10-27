@@ -7,6 +7,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.webjars.NotFoundException;
+import sistema.dto.MatchDetailsDTO;
 import sistema.dto.PlayerMatchDTO;
 import sistema.dto.ScoreDTO;
 import sistema.model.*;
@@ -205,5 +206,34 @@ public class PlayerScoreService {
 
     public List<PlayerScore> getRoundsHistory(UUID matchId) {
         return playerScoreRepository.findByMatchIdOrderByRoundNumberAsc(matchId);
+    }
+
+    public MatchDetailsDTO getMatchDetails(UUID matchId) {
+        Match match = matchRepository.findById(matchId)
+                .orElseThrow(() -> new NotFoundException("Partida não encontrada"));
+
+        List<PlayerScore> playerScores = playerScoreRepository.findByMatchId(matchId);
+
+        MatchDetailsDTO dto = new MatchDetailsDTO();
+        dto.setMatchId(match.getId());
+        dto.setGroupName(match.getGroup().getName());
+        dto.setMatchDate(match.getMatchDate());
+        dto.setGameMode(match.getGameMode());
+        dto.setWinner(match.getWinner());
+
+        List<MatchDetailsDTO.PlayerDetailDTO> playerDetails = playerScores.stream()
+                .map(ps -> {
+                    MatchDetailsDTO.PlayerDetailDTO playerDetail = new MatchDetailsDTO.PlayerDetailDTO();
+                    playerDetail.setUserId(ps.getUser().getId());
+                    playerDetail.setNickname(ps.getUser().getNickname());
+                    playerDetail.setScore(ps.getTotalScore());
+                    playerDetail.setTeam(ps.getTeam());
+                    playerDetail.setWinner(ps.getIsWinner() != null && ps.getIsWinner());
+                    return playerDetail;
+                })
+                .toList();
+
+        dto.setPlayers(playerDetails);
+        return dto;
     }
 }

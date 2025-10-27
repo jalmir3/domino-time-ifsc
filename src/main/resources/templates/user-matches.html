@@ -40,7 +40,7 @@
             <th class="score-header">Grupo</th>
             <th class="score-header">Pontuação</th>
             <th class="score-header">Data</th>
-            <th class="score-header">Status</th>
+            <th class="score-header">Ações</th>
         </tr>
         </thead>
         <tbody>
@@ -49,8 +49,10 @@
             <td class="score-cell" th:text="${match.playerScore + ' pontos'}">0 pontos</td>
             <td class="score-cell" th:text="${#temporals.format(match.matchDate, 'dd/MM/yyyy')}"></td>
             <td class="score-cell">
-                <span th:if="${match.winner}" class="badge badge-success">VENCEDOR</span>
-                <span th:unless="${match.winner}" class="badge badge-secondary">PARTICIPANTE</span>
+                <a class="btn-match-details"
+                   th:attr="data-match-id=${match.matchId}">
+                    <i class="fas fa-eye"></i> Detalhes
+                </a>
             </td>
         </tr>
         <tr th:if="${matchesPage.content.empty}">
@@ -68,7 +70,8 @@
                 </a>
             </li>
             <li class="page-item" th:classappend="${matchesPage.first} ? 'disabled' : ''">
-                <a class="page-link" th:href="@{/matches/my-matches(page=${matchesPage.number-1},size=${matchesPage.size})}">
+                <a class="page-link"
+                   th:href="@{/matches/my-matches(page=${matchesPage.number-1},size=${matchesPage.size})}">
                     <span aria-hidden="true">&laquo;</span>
                 </a>
             </li>
@@ -80,12 +83,14 @@
                    th:text="${i+1}">1</a>
             </li>
             <li class="page-item" th:classappend="${matchesPage.last} ? 'disabled' : ''">
-                <a class="page-link" th:href="@{/matches/my-matches(page=${matchesPage.number+1},size=${matchesPage.size})}">
+                <a class="page-link"
+                   th:href="@{/matches/my-matches(page=${matchesPage.number+1},size=${matchesPage.size})}">
                     <span aria-hidden="true">&raquo;</span>
                 </a>
             </li>
             <li class="page-item" th:classappend="${matchesPage.last} ? 'disabled' : ''">
-                <a class="page-link" th:href="@{/matches/my-matches(page=${matchesPage.totalPages-1},size=${matchesPage.size})}">
+                <a class="page-link"
+                   th:href="@{/matches/my-matches(page=${matchesPage.totalPages-1},size=${matchesPage.size})}">
                     <span aria-hidden="true">&raquo;&raquo;</span>
                 </a>
             </li>
@@ -98,37 +103,48 @@
         </div>
     </div>
 </div>
+<div class="modal fade avatar-modal" id="matchDetailsModal" tabindex="-1" role="dialog"
+     aria-labelledby="matchDetailsTitle" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="matchDetailsTitle">Detalhes da Partida</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Fechar">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="sheet-content">
+                <div class="modal-body" id="matchDetailsBody">
+                    <div class="text-center py-4">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="sr-only">Carregando...</span>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="avatar-overlay" id="matchDetailsOverlay"></div>
+<div class="delete-account-bottom-sheet" id="matchDetailsBottomSheet">
+    <div class="sheet-header">
+        <h5 class="sheet-title">Detalhes da Partida</h5>
+        <button type="button" class="close-btn" id="closeMatchDetailsBottomSheet">
+            <i class="fas fa-times"></i>
+        </button>
+    </div>
+    <div class="sheet-content" id="matchDetailsBodyMobile"></div>
+</div>
+
 <div class="footer-bar">
     Convide seus amigos e comece a marcar suas partidas de dominó agora mesmo!
 </div>
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const userIcons = document.querySelectorAll('.user-icon');
-        const dropdownContents = document.querySelectorAll('.dropdown-content');
-        userIcons.forEach(icon => {
-            icon.addEventListener('click', function(e) {
-                e.stopPropagation();
-                const dropdown = this.closest('.user-dropdown');
-                const content = dropdown.querySelector('.dropdown-content');
-                dropdownContents.forEach(dc => {
-                    if (dc !== content) {
-                        dc.style.display = 'none';
-                    }
-                });
-                content.style.display = content.style.display === 'block' ? 'none' : 'block';
-            });
-        });
-        document.addEventListener('click', function(e) {
-            if (!e.target.closest('.user-dropdown')) {
-                dropdownContents.forEach(content => {
-                    content.style.display = 'none';
-                });
-            }
-        });
-    });
-</script>
+<script th:src="@{/js/common.js}"></script>
 </body>
 </html>

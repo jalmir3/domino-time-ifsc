@@ -108,7 +108,7 @@ public class AccountController {
                 model.addAttribute("user", user);
                 return "account";
             }
-            userService.softDeleteUser(user.getId(), password);
+            userService.deleteUser(user.getId(), password);
             new SecurityContextLogoutHandler().logout(request, response,
                     SecurityContextHolder.getContext().getAuthentication());
             return "redirect:/login?deleted";

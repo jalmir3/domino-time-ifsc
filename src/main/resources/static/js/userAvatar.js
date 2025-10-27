@@ -1,9 +1,11 @@
 document.addEventListener('DOMContentLoaded', function() {
-    const userIcon = document.getElementById('userAvatarIcon') || document.getElementById('headerUserIcon');
+    const userIcon = document.getElementById('userAvatarIcon');
     if (!userIcon) return;
+
     const cachedAvatar = localStorage.getItem('userAvatar');
     const cachedTS = localStorage.getItem('userAvatarTS');
     const currentAvatarFromDOM = userIcon.getAttribute('data-avatar');
+
     if (cachedAvatar) {
         console.log('[userAvatar.js] aplicando avatar do localStorage (ts):', cachedTS);
         applyAvatarStyles(userIcon, cachedAvatar);
@@ -19,6 +21,7 @@ document.addEventListener('DOMContentLoaded', function() {
     } else {
         console.log('[userAvatar.js] nenhum avatar em cache ou DOM');
     }
+
     document.querySelectorAll('.logout-form').forEach(form => {
         form.addEventListener('submit', function () {
             localStorage.removeItem('userAvatar');
@@ -26,8 +29,10 @@ document.addEventListener('DOMContentLoaded', function() {
             console.log('[Logout] cache do avatar limpo');
         });
     });
+
     setupUserDropdown();
 });
+
 function applyAvatarStyles(icon, avatarUrl) {
     if (!avatarUrl) return;
     icon.style.backgroundImage = `url(${avatarUrl})`;
@@ -36,20 +41,25 @@ function applyAvatarStyles(icon, avatarUrl) {
     icon.style.backgroundSize = 'cover';
     icon.style.backgroundPosition = 'center';
 }
+
 function setupUserDropdown() {
     const userIcons = document.querySelectorAll('.user-icon');
     const dropdownContents = document.querySelectorAll('.dropdown-content');
+
     userIcons.forEach(icon => {
         icon.addEventListener('click', function(e) {
             e.stopPropagation();
             const dropdown = this.closest('.user-dropdown');
             const content = dropdown.querySelector('.dropdown-content');
+
             dropdownContents.forEach(dc => {
                 if (dc !== content) dc.style.display = 'none';
             });
+
             content.style.display = content.style.display === 'block' ? 'none' : 'block';
         });
     });
+
     document.addEventListener('click', function(e) {
         if (!e.target.closest('.user-dropdown')) {
             dropdownContents.forEach(content => {

@@ -13,11 +13,13 @@
 <body>
 <div class="header">
     <div class="logo">
-        <img th:onclick="|window.location.href='@{/home}'|" th:src="@{/images/logo.png}" alt="Logo" class="logo-img" id="headerLogo">
+        <img th:onclick="|window.location.href='@{/home}'|" th:src="@{/images/logo.png}" alt="Logo" class="logo-img"
+             id="headerLogo">
     </div>
     <div class="buttons">
         <div sec:authorize="isAuthenticated()" class="user-dropdown">
-            <i class="fas fa-user-circle user-icon" id="headerUserIcon"></i>
+            <i class="fas fa-user-circle user-icon" id="userAvatarIcon"
+               th:attr="data-avatar=${#authentication.principal.avatar}"></i>
             <div class="dropdown-content">
                 <div class="user-name" th:text="${#authentication.principal.nickname}"></div>
                 <a th:href="@{/account}">Gerenciar conta</a>
@@ -96,6 +98,109 @@
             <button type="submit" class="btn btn-danger btn-block">Sair da Conta</button>
         </form>
     </div>
+    <div class="form-group">
+        <button type="button" class="btn btn-outline-danger btn-block" onclick="openDeleteAccountModal()">
+            <i class="fas fa-trash-alt"></i> Deletar Conta
+        </button>
+    </div>
+</div>
+<div class="modal fade avatar-modal" id="deleteAccountModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Deletar Conta</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-warning">
+                    <i class="fas fa-warning"></i>
+                    <strong>Atenção:</strong> Esta ação é irreversível!
+                </div>
+                <p>Ao deletar sua conta:</p>
+                <ul>
+                    <li>Você perderá acesso a todas as suas partidas e histórico</li>
+                    <li>Não será possível recuperar os dados da conta</li>
+                    <li>Para usar o sistema novamente, será necessário criar uma nova conta</li>
+                </ul>
+
+                <form id="deleteAccountForm" th:action="@{/account/delete}" method="post">
+                    <div class="form-group">
+                        <div class="custom-control custom-checkbox">
+                            <input type="checkbox" class="custom-control-input" id="confirmDeleteCheckbox"
+                                   onchange="toggleDeleteButton()">
+                            <label class="custom-control-label" for="confirmDeleteCheckbox">
+                                Li e estou de acordo com a exclusão permanente da minha conta
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="deletePassword">Digite sua senha para confirmar:</label>
+                        <input type="password" class="form-control" id="deletePassword" name="password"
+                               placeholder="Senha atual" required>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-danger" id="confirmDeleteBtn"
+                        onclick="confirmDeleteAccount()" disabled>
+                    <i class="fas fa-trash-alt"></i> Deletar Conta
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="delete-account-overlay" id="deleteAccountOverlay"></div>
+<div class="delete-account-bottom-sheet" id="deleteAccountBottomSheet">
+    <div class="sheet-header">
+        <h5 class="sheet-title">Deletar Conta</h5>
+        <button type="button" class="close-btn" onclick="closeDeleteAccountBottomSheet()">
+            <i class="fas fa-times"></i>
+        </button>
+    </div>
+    <div class="sheet-content">
+        <div class="alert alert-warning">
+            <i class="fas fa-warning"></i>
+            <strong>Atenção:</strong> Esta ação é irreversível!
+        </div>
+        <p>Ao deletar sua conta:</p>
+        <ul>
+            <li>Você perderá acesso a todas as suas partidas e histórico</li>
+            <li>Não será possível recuperar os dados da conta</li>
+            <li>Para usar o sistema novamente, será necessário criar uma nova conta</li>
+        </ul>
+
+        <form id="deleteAccountFormMobile" th:action="@{/account/delete}" method="post">
+            <div class="form-group">
+                <div class="custom-control custom-checkbox">
+                    <input type="checkbox" class="custom-control-input" id="confirmDeleteCheckboxMobile"
+                           onchange="toggleDeleteButtonMobile()">
+                    <label class="custom-control-label" for="confirmDeleteCheckboxMobile">
+                        Li e estou de acordo com a exclusão permanente da minha conta
+                    </label>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="deletePasswordMobile">Digite sua senha para confirmar:</label>
+                <input type="password" class="form-control" id="deletePasswordMobile" name="password"
+                       placeholder="Senha atual" required>
+            </div>
+        </form>
+
+        <div class="d-grid gap-2">
+            <button type="button" class="btn btn-danger" id="confirmDeleteBtnMobile"
+                    onclick="confirmDeleteAccountMobile()" disabled>
+                <i class="fas fa-trash-alt"></i> Deletar Conta
+            </button>
+            <button type="button" class="btn btn-secondary" onclick="closeDeleteAccountBottomSheet()">
+                Cancelar
+            </button>
+        </div>
+    </div>
 </div>
 <div class="modal fade avatar-modal" id="avatarModal" tabindex="-1" role="dialog" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" role="document">
@@ -131,31 +236,33 @@
     </div>
 </div>
 <div class="avatar-overlay" id="avatarOverlay"></div>
-<div class="avatar-bottom-sheet" id="avatarBottomSheet">
+<div class="delete-account-bottom-sheet" id="avatarBottomSheet">
     <div class="sheet-header">
         <h5 class="sheet-title">Editar Foto de Perfil</h5>
         <button type="button" class="close-btn" id="closeBottomSheet">
             <i class="fas fa-times"></i>
         </button>
     </div>
-    <div class="alert alert-info">
-        <small>
-            <i class="fas fa-info-circle"></i> Formatos aceitos: JPG, JPEG, PNG. Tamanho máximo: 2MB.
-            A imagem será redimensionada para 150x150 pixels.
-        </small>
-    </div>
-    <div class="text-center mb-3">
-        <div class="upload-btn-wrapper">
-            <button class="btn"><i class="fas fa-upload"></i> Selecionar Imagem</button>
-            <input type="file" id="avatarUploadMobile" accept="image/jpeg,image/png,image/jpg">
+    <div class="sheet-content">
+        <div class="alert alert-info">
+            <small>
+                <i class="fas fa-info-circle"></i> Formatos aceitos: JPG, JPEG, PNG. Tamanho máximo: 2MB.
+                A imagem será redimensionada para 150x150 pixels.
+            </small>
         </div>
-    </div>
-    <div class="cropper-container mb-3" style="display: none;">
-        <img id="imageToCropMobile" class="img-fluid">
-    </div>
-    <div class="d-grid gap-2">
-        <button type="button" class="btn btn-primary" id="saveAvatarMobile" disabled>Salvar</button>
-        <button type="button" class="btn btn-danger" id="cancelAvatarMobile">Cancelar</button>
+        <div class="text-center mb-3">
+            <div class="upload-btn-wrapper">
+                <button class="btn"><i class="fas fa-upload"></i> Selecionar Imagem</button>
+                <input type="file" id="avatarUploadMobile" accept="image/jpeg,image/png,image/jpg">
+            </div>
+        </div>
+        <div class="cropper-container mb-3" style="display: none;">
+            <img id="imageToCropMobile" class="img-fluid">
+        </div>
+        <div class="d-grid gap-2">
+            <button type="button" class="btn btn-primary" id="saveAvatarMobile" disabled>Salvar</button>
+            <button type="button" class="btn btn-danger" id="cancelAvatarMobile">Cancelar</button>
+        </div>
     </div>
 </div>
 <div class="footer-bar">
@@ -165,281 +272,7 @@
 <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
-<script>
-    let cropper;
-    let cropperMobile;
-    let isMobile = window.innerWidth <= 768;
-    document.addEventListener('DOMContentLoaded', function () {
-        loadCachedAvatar();
-        checkMobile();
-        window.addEventListener('resize', checkMobile);
-        setupAvatarEvents();
-        setupPasswordValidation();
-        initializeExistingFunctions();
-    });
-    function saveAvatarToCache(avatarData) {
-        try {
-            if (!avatarData) return;
-            localStorage.setItem('userAvatar', avatarData);
-            localStorage.setItem('userAvatarTS', String(Date.now()));
-        } catch (err) {
-        }
-    }
-    function updateHeaderAvatar(avatarData) {
-        const headerIcon = document.getElementById('headerUserIcon');
-        const avatarPreview = document.getElementById('avatarPreview');
-        if (headerIcon && avatarData) {
-            headerIcon.style.backgroundImage = `url(${avatarData})`;
-            headerIcon.classList.remove('fa-user-circle');
-            headerIcon.classList.add('avatar-loaded');
-            headerIcon.style.backgroundSize = 'cover';
-            headerIcon.style.backgroundPosition = 'center';
-        }
-        if (avatarPreview && avatarData) {
-            avatarPreview.src = avatarData;
-        }
-        saveAvatarToCache(avatarData);
-    }
-    function loadCachedAvatar() {
-        const cachedAvatar = localStorage.getItem('userAvatar');
-        const cachedTS = localStorage.getItem('userAvatarTS');
-        const headerIcon = document.getElementById('headerUserIcon');
-        const avatarPreview = document.getElementById('avatarPreview');
-        if (cachedAvatar) {
-            if (headerIcon) {
-                headerIcon.style.backgroundImage = `url(${cachedAvatar})`;
-                headerIcon.classList.remove('fa-user-circle');
-                headerIcon.classList.add('avatar-loaded');
-                headerIcon.style.backgroundSize = 'cover';
-                headerIcon.style.backgroundPosition = 'center';
-            }
-            if (avatarPreview) avatarPreview.src = cachedAvatar;
-            return;
-        }
-        const headerUserIconElem = document.getElementById('headerUserIcon');
-        const currentAvatar = headerUserIconElem ? headerUserIconElem.getAttribute('data-avatar') : null;
-        if (currentAvatar) {
-            updateHeaderAvatar(currentAvatar);
-        }
-    }
-    function checkMobile() {
-        isMobile = window.innerWidth <= 768;
-    }
-    function setupPasswordValidation() {
-        const newPassword = document.getElementById('newPassword');
-        const confirmPassword = document.getElementById('confirmPassword');
-        const newPasswordFeedback = document.getElementById('newPasswordFeedback');
-        const confirmPasswordFeedback = document.getElementById('confirmPasswordFeedback');
-        const submitButton = document.getElementById('submitButton');
-        if (!newPassword || !confirmPassword) return;
-        newPassword.addEventListener('input', validatePasswords);
-        confirmPassword.addEventListener('input', validatePasswords);
-        function validatePasswords() {
-            const newPass = newPassword.value;
-            const confirmPass = confirmPassword.value;
-            newPasswordFeedback.style.display = 'none';
-            confirmPasswordFeedback.style.display = 'none';
-            if (!newPass && !confirmPass) {
-                submitButton.disabled = true;
-                return;
-            }
-            if (newPass.length > 0) {
-                if (newPass.length < 6) {
-                    newPasswordFeedback.textContent = 'A senha deve ter pelo menos 6 caracteres';
-                    newPasswordFeedback.className = 'password-feedback password-mismatch';
-                    newPasswordFeedback.style.display = 'block';
-                } else {
-                    newPasswordFeedback.textContent = 'Senha válida';
-                    newPasswordFeedback.className = 'password-feedback password-match';
-                    newPasswordFeedback.style.display = 'block';
-                }
-            }
-            if (confirmPass.length > 0) {
-                if (newPass !== confirmPass) {
-                    confirmPasswordFeedback.textContent = 'As senhas não coincidem';
-                    confirmPasswordFeedback.className = 'password-feedback password-mismatch';
-                    confirmPasswordFeedback.style.display = 'block';
-                } else if (newPass.length >= 6) {
-                    confirmPasswordFeedback.textContent = 'Senhas coincidem';
-                    confirmPasswordFeedback.className = 'password-feedback password-match';
-                    confirmPasswordFeedback.style.display = 'block';
-                }
-            }
-            submitButton.disabled = !(newPass && confirmPass && newPass === confirmPass && newPass.length >= 6);
-        }
-    }
-    function openAvatarEditor() {
-        if (isMobile) openBottomSheet();
-        else $('#avatarModal').modal('show');
-    }
-    function setupAvatarEvents() {
-        const avatarUpload = document.getElementById('avatarUpload');
-        if (avatarUpload) avatarUpload.addEventListener('change', (e) => handleImageSelect(e, 'desktop'));
-        const avatarUploadMobile = document.getElementById('avatarUploadMobile');
-        if (avatarUploadMobile) avatarUploadMobile.addEventListener('change', (e) => handleImageSelect(e, 'mobile'));
-        document.getElementById('closeBottomSheet')?.addEventListener('click', closeBottomSheet);
-        document.getElementById('cancelAvatarMobile')?.addEventListener('click', closeBottomSheet);
-        document.getElementById('avatarOverlay')?.addEventListener('click', closeBottomSheet);
-        document.getElementById('saveAvatarMobile')?.addEventListener('click', () => cropAndSaveImage('mobile'));
-        document.getElementById('saveAvatar')?.addEventListener('click', () => cropAndSaveImage('desktop'));
-    }
-    function openBottomSheet() {
-        document.getElementById('avatarOverlay').classList.add('show');
-        document.getElementById('avatarBottomSheet').classList.add('show');
-    }
-    function closeBottomSheet() {
-        document.getElementById('avatarOverlay').classList.remove('show');
-        document.getElementById('avatarBottomSheet').classList.remove('show');
-        if (cropperMobile) {
-            cropperMobile.destroy();
-            cropperMobile = null;
-        }
-        const uploadMobile = document.getElementById('avatarUploadMobile');
-        if (uploadMobile) uploadMobile.value = '';
-        const container = document.querySelector('#avatarBottomSheet .cropper-container');
-        if (container) container.style.display = 'none';
-        const saveBtn = document.getElementById('saveAvatarMobile');
-        if (saveBtn) saveBtn.disabled = true;
-    }
-    function handleImageSelect(e, platform) {
-        const file = e.target.files[0];
-        if (!file) return;
-        const validTypes = ['image/jpeg', 'image/jpg', 'image/png'];
-        if (!validTypes.includes(file.type)) {
-            alert('Por favor, selecione JPG, JPEG ou PNG.');
-            e.target.value = '';
-            return;
-        }
-        if (file.size > 2 * 1024 * 1024) {
-            alert('A imagem deve ter no máximo 2MB.');
-            e.target.value = '';
-            return;
-        }
-        const reader = new FileReader();
-        reader.onload = function (event) {
-            initCropper(event.target.result, platform);
-        };
-        reader.readAsDataURL(file);
-    }
-    function initCropper(imageSrc, platform) {
-        const isMobilePlatform = platform === 'mobile';
-        const imageId = isMobilePlatform ? 'imageToCropMobile' : 'imageToCrop';
-        const containerSelector = isMobilePlatform ? '#avatarBottomSheet .cropper-container' : '.modal .cropper-container';
-        const saveButtonId = isMobilePlatform ? 'saveAvatarMobile' : 'saveAvatar';
-        const container = document.querySelector(containerSelector);
-        if (container) container.style.display = 'block';
-        const imageElement = document.getElementById(imageId);
-        imageElement.src = imageSrc;
-        if (isMobilePlatform && cropperMobile) cropperMobile.destroy();
-        else if (!isMobilePlatform && cropper) cropper.destroy();
-        const options = {
-            aspectRatio: 1,
-            viewMode: 1,
-            movable: true,
-            scalable: true,
-            zoomable: true,
-            cropBoxMovable: true,
-            cropBoxResizable: true
-        };
-        if (isMobilePlatform) cropperMobile = new Cropper(imageElement, options);
-        else cropper = new Cropper(imageElement, options);
-        const saveBtn = document.getElementById(saveButtonId);
-        if (saveBtn) saveBtn.disabled = false;
-    }
-    function cropAndSaveImage(platform) {
-        const currentCropper = platform === 'mobile' ? cropperMobile : cropper;
-        if (!currentCropper) return;
-        const canvas = currentCropper.getCroppedCanvas({
-            width: 150,
-            height: 150,
-            imageSmoothingEnabled: true,
-            imageSmoothingQuality: 'high'
-        });
-        const base64Image = canvas.toDataURL('image/jpeg', 0.9);
-        updateHeaderAvatar(base64Image);
-        const avatarBase64Input = document.getElementById('avatarBase64');
-        if (avatarBase64Input) avatarBase64Input.value = base64Image;
-        if (platform === 'mobile') {
-            closeBottomSheet();
-        } else {
-            $('#avatarModal').modal('hide');
-            if (cropper) { cropper.destroy(); cropper = null; }
-            const container = document.querySelector('.modal .cropper-container');
-            if (container) container.style.display = 'none';
-            const upload = document.getElementById('avatarUpload');
-            if (upload) upload.value = '';
-            const saveBtn = document.getElementById('saveAvatar');
-            if (saveBtn) saveBtn.disabled = true;
-        }
-    }
-    function initializeExistingFunctions() {
-        const errorAlert = document.getElementById('errorAlert');
-        if (errorAlert) {
-            setTimeout(() => {
-                errorAlert.classList.add('fade');
-                setTimeout(() => errorAlert.remove(), 500);
-            }, 4000);
-        }
-        const successAlert = document.getElementById('successAlert');
-        if (successAlert) {
-            setTimeout(() => {
-                successAlert.classList.add('fade');
-                setTimeout(() => successAlert.remove(), 500);
-                const avatarBase64 = document.getElementById('avatarBase64')?.value;
-                if (avatarBase64) {
-                    const cached = localStorage.getItem('userAvatar');
-                    if (!cached || cached !== avatarBase64) {
-                        updateHeaderAvatar(avatarBase64);
-                    }
-                }
-            }, 4000);
-        }
-        const form = document.querySelector('form');
-        if (form) {
-            form.addEventListener('submit', function (e) {
-                const newPassword = document.getElementById('newPassword')?.value;
-                const confirmPassword = document.getElementById('confirmPassword')?.value;
-                const currentPassword = document.getElementById('currentPassword')?.value;
-                if (newPassword && !currentPassword) {
-                    e.preventDefault();
-                    alert('Informe a senha atual para alterar.');
-                    return;
-                }
-                if (newPassword && newPassword !== confirmPassword) {
-                    e.preventDefault();
-                    alert('As novas senhas não coincidem.');
-                    return;
-                }
-                const avatarBase64 = document.getElementById('avatarBase64')?.value;
-                if (avatarBase64) updateHeaderAvatar(avatarBase64);
-            });
-        }
-        const logoutForm = document.querySelector('.logout-form');
-        if (logoutForm) {
-            logoutForm.addEventListener('submit', function () {
-                localStorage.removeItem('userAvatar');
-                localStorage.removeItem('userAvatarTS');
-            });
-        }
-        const userIcons = document.querySelectorAll('.user-icon');
-        const dropdownContents = document.querySelectorAll('.dropdown-content');
-        userIcons.forEach(icon => {
-            icon.addEventListener('click', function (e) {
-                e.stopPropagation();
-                const dropdown = this.closest('.user-dropdown');
-                const content = dropdown.querySelector('.dropdown-content');
-                dropdownContents.forEach(dc => {
-                    if (dc !== content) dc.style.display = 'none';
-                });
-                content.style.display = content.style.display === 'block' ? 'none' : 'block';
-            });
-        });
-        document.addEventListener('click', function (e) {
-            if (!e.target.closest('.user-dropdown')) {
-                dropdownContents.forEach(content => content.style.display = 'none');
-            }
-        });
-    }
-</script>
+<script th:src="@{/js/common.js}"></script>
+<script th:src="@{/js/userAvatar.js}"></script>
 </body>
 </html>
