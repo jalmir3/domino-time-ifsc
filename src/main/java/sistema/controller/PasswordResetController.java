@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import sistema.dto.PasswordResetRequestDto;
+import sistema.dto.PasswordResetRequestDTO;
 import sistema.service.EmailService;
 import sistema.service.UserService;
 
@@ -22,12 +22,12 @@ public class PasswordResetController {
 
     @GetMapping
     public String showForgotPasswordForm(Model model) {
-        model.addAttribute("request", new PasswordResetRequestDto());
+        model.addAttribute("request", new PasswordResetRequestDTO());
         return "forgot-password";
     }
 
     @PostMapping
-    public String processForgotPassword(@Valid @ModelAttribute("request") PasswordResetRequestDto request,
+    public String processForgotPassword(@Valid @ModelAttribute("request") PasswordResetRequestDTO request,
                                         BindingResult result,
                                         Model model) {
         if (result.hasErrors()) {

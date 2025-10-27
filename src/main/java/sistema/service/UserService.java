@@ -6,7 +6,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import sistema.dto.UserRegistrationDto;
+import sistema.dto.UserRegistrationDTO;
 import sistema.model.User;
 import sistema.model.UserStatus;
 import sistema.repository.UserRepository;
@@ -22,7 +22,7 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
     private final EmailService emailService;
 
-    public void registerUserWithActivation(UserRegistrationDto registrationDto) throws MessagingException {
+    public void registerUserWithActivation(UserRegistrationDTO registrationDto) throws MessagingException {
         if (!registrationDto.getPassword().equals(registrationDto.getConfirmPassword())) {
             throw new IllegalArgumentException("Senhas não coincidem");
         }
