@@ -182,7 +182,6 @@ public class PlayerScoreService {
                     .max(Comparator.comparingInt(PlayerScore::getTotalScore));
             if (winnerOpt.isPresent()) {
                 PlayerScore winner = winnerOpt.get();
-                // Usar o nome salvo no playerName se o usuário foi deletado, senão usar o nickname atual
                 String winnerName = winner.getUser().getStatus() == UserStatus.DELETED
                     ? winner.getPlayerName()
                     : winner.getUser().getNickname();
@@ -234,8 +233,6 @@ public class PlayerScoreService {
         List<MatchDetailsDTO.PlayerDetailDTO> playerDetails = playerScores.stream()
                 .map(ps -> {
                     MatchDetailsDTO.PlayerDetailDTO playerDetail = new MatchDetailsDTO.PlayerDetailDTO();
-
-                    // Se o usuário foi deletado logicamente, usar o nome salvo no playerName
                     if (ps.getUser().getStatus() == UserStatus.DELETED) {
                         playerDetail.setUserId(ps.getUser().getId());
                         playerDetail.setNickname(ps.getPlayerName() != null ? ps.getPlayerName() : "Usuário deletado");
