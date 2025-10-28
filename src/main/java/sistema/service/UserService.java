@@ -21,6 +21,7 @@ public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final EmailService emailService;
+    private final PlayerScoreService playerScoreService; // Adicionado para atualizar o nome do jogador
 
     public void registerUserWithActivation(UserRegistrationDTO registrationDto) throws MessagingException {
         if (!registrationDto.getPassword().equals(registrationDto.getConfirmPassword())) {
@@ -116,9 +117,12 @@ public class UserService {
         if (!passwordEncoder.matches(password, user.getPassword())) {
             throw new IllegalArgumentException("Senha incorreta");
         }
+
+        String deletedPlayerName = "deletado";
+        playerScoreService.updatePlayerNameForDeletedUser(userId, deletedPlayerName);
         user.setStatus(UserStatus.DELETED);
         user.setEmail(user.getId() + "@deleted.com");
-        user.setNickname(user.getNickname()+"(deletado)");
+        user.setNickname(user.getId() + "(deletado)");
         user.setDeletedAt(LocalDateTime.now());
         user.setAvatar(null);
         userRepository.save(user);

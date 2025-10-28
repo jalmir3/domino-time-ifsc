@@ -49,6 +49,7 @@ public class PlayerScoreService {
             score.setScore(dto.score());
             score.setTotalScore(dto.score());
             score.setIsWinner(dto.equals(winnerDto));
+            score.setPlayerName(player.getNickname());
             playerScoreRepository.save(score);
         });
         match.setStatus(MatchStatus.FINISHED);
@@ -82,6 +83,7 @@ public class PlayerScoreService {
                 .orElseThrow(() -> new NotFoundException("Partida não encontrada"));
         int safeTeamAScore = (teamAScore != null) ? teamAScore : 0;
         int safeTeamBScore = (teamBScore != null) ? teamBScore : 0;
+
         for (UUID playerId : teamAPlayerIds) {
             User player = userRepository.findById(playerId)
                     .orElseThrow(() -> new NotFoundException("Jogador não encontrado"));
@@ -91,6 +93,7 @@ public class PlayerScoreService {
                 newScore.setMatch(match);
                 newScore.setUser(player);
                 newScore.setTeam("A");
+                newScore.setPlayerName(player.getNickname());
                 return newScore;
             });
             playerScore.setTotalScore(playerScore.getTotalScore() + safeTeamAScore);
@@ -99,6 +102,7 @@ public class PlayerScoreService {
             playerScore.setRoundNumber(roundNumber);
             playerScoreRepository.save(playerScore);
         }
+
         for (UUID playerId : teamBPlayerIds) {
             User player = userRepository.findById(playerId)
                     .orElseThrow(() -> new NotFoundException("Jogador não encontrado"));
@@ -108,6 +112,7 @@ public class PlayerScoreService {
                 newScore.setMatch(match);
                 newScore.setUser(player);
                 newScore.setTeam("B");
+                newScore.setPlayerName(player.getNickname()); // Sempre salvar o nome do jogador
                 return newScore;
             });
             playerScore.setTotalScore(playerScore.getTotalScore() + safeTeamBScore);
@@ -116,35 +121,36 @@ public class PlayerScoreService {
             playerScore.setRoundNumber(roundNumber);
             playerScoreRepository.save(playerScore);
         }
-        RoundHistory roundHistory = new RoundHistory();
-        roundHistory.setMatch(match);
-        roundHistory.setRoundNumber(roundNumber);
-        roundHistory.setTeamAScore(safeTeamAScore);
-        roundHistory.setTeamBScore(safeTeamBScore);
-        roundHistoryRepository.save(roundHistory);
+
         checkAndFinishMatch(matchId, match.getGameMode());
     }
 
     @Transactional
-    public void saveIndividualRound(UUID matchId, Integer roundNumber, List<ScoreDTO> scoreDTOs) {
+    public void saveIndividualRound(UUID matchId, Integer roundNumber, List<ScoreDTO> scores) {
         Match match = matchRepository.findById(matchId)
                 .orElseThrow(() -> new NotFoundException("Partida não encontrada"));
-        for (ScoreDTO dto : scoreDTOs) {
+
+        scores.forEach(dto -> {
             User player = userRepository.findById(dto.userId())
                     .orElseThrow(() -> new NotFoundException("Jogador não encontrado: " + dto.userId()));
+
             Optional<PlayerScore> existingScoreOpt = playerScoreRepository.findByMatchIdAndUserId(matchId, dto.userId());
             PlayerScore playerScore = existingScoreOpt.orElseGet(() -> {
                 PlayerScore newScore = new PlayerScore();
                 newScore.setMatch(match);
                 newScore.setUser(player);
+                newScore.setTotalScore(0);
+                newScore.setPlayerName(player.getNickname());
                 return newScore;
             });
+
             playerScore.setTotalScore(playerScore.getTotalScore() + dto.score());
             playerScore.setScore(dto.score());
             playerScore.setCurrentRound(roundNumber);
             playerScore.setRoundNumber(roundNumber);
             playerScoreRepository.save(playerScore);
-        }
+        });
+
         checkAndFinishMatch(matchId, match.getGameMode());
     }
 
@@ -176,7 +182,11 @@ public class PlayerScoreService {
                     .max(Comparator.comparingInt(PlayerScore::getTotalScore));
             if (winnerOpt.isPresent()) {
                 PlayerScore winner = winnerOpt.get();
-                match.setWinner(winner.getUser().getNickname());
+                // Usar o nome salvo no playerName se o usuário foi deletado, senão usar o nickname atual
+                String winnerName = winner.getUser().getStatus() == UserStatus.DELETED
+                    ? winner.getPlayerName()
+                    : winner.getUser().getNickname();
+                match.setWinner(winnerName);
                 match.setStatus(MatchStatus.FINISHED);
                 matchRepository.save(match);
                 scores.forEach(ps -> {
@@ -224,8 +234,16 @@ public class PlayerScoreService {
         List<MatchDetailsDTO.PlayerDetailDTO> playerDetails = playerScores.stream()
                 .map(ps -> {
                     MatchDetailsDTO.PlayerDetailDTO playerDetail = new MatchDetailsDTO.PlayerDetailDTO();
-                    playerDetail.setUserId(ps.getUser().getId());
-                    playerDetail.setNickname(ps.getUser().getNickname());
+
+                    // Se o usuário foi deletado logicamente, usar o nome salvo no playerName
+                    if (ps.getUser().getStatus() == UserStatus.DELETED) {
+                        playerDetail.setUserId(ps.getUser().getId());
+                        playerDetail.setNickname(ps.getPlayerName() != null ? ps.getPlayerName() : "Usuário deletado");
+                    } else {
+                        playerDetail.setUserId(ps.getUser().getId());
+                        playerDetail.setNickname(ps.getUser().getNickname());
+                    }
+
                     playerDetail.setScore(ps.getTotalScore());
                     playerDetail.setTeam(ps.getTeam());
                     playerDetail.setWinner(ps.getIsWinner() != null && ps.getIsWinner());
@@ -235,5 +253,10 @@ public class PlayerScoreService {
 
         dto.setPlayers(playerDetails);
         return dto;
+    }
+
+    @Transactional
+    public void updatePlayerNameForDeletedUser(UUID userId, String deletedPlayerName) {
+        playerScoreRepository.updatePlayerNameByUserId(userId, deletedPlayerName);
     }
 }
