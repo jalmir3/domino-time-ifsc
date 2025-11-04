@@ -1226,3 +1226,108 @@ document.addEventListener('DOMContentLoaded', function() {
         deleteAccountOverlay.addEventListener('click', window.closeDeleteAccountBottomSheet);
     }
 });
+
+function showRulesModal() {
+    if (window.innerWidth <= 768) {
+        const overlay = document.getElementById('avatarOverlay');
+        const bottomSheet = document.getElementById('avatarBottomSheet');
+        if (overlay && bottomSheet) {
+            overlay.classList.add('show');
+            bottomSheet.classList.add('show');
+        }
+    } else {
+        const modal = document.getElementById('avatarModal');
+        if (modal) {
+            $('#avatarModal').modal('show');
+        }
+    }
+}
+
+function closeRulesModal() {
+    if (window.innerWidth <= 768) {
+        const overlay = document.getElementById('avatarOverlay');
+        const bottomSheet = document.getElementById('avatarBottomSheet');
+        if (overlay && bottomSheet) {
+            overlay.classList.remove('show');
+            bottomSheet.classList.remove('show');
+        }
+    } else {
+        if (typeof $ !== 'undefined') {
+            $('#avatarModal').modal('hide');
+        }
+    }
+}
+
+function showConfigModal() {
+    if (window.innerWidth <= 768) {
+        const overlay = document.getElementById('configOverlay');
+        const bottomSheet = document.getElementById('configBottomSheet');
+        if (overlay && bottomSheet) {
+            overlay.classList.add('show');
+            bottomSheet.classList.add('show');
+        }
+    } else {
+        const modal = document.getElementById('configModal');
+        if (modal) {
+            $('#configModal').modal('show');
+        }
+    }
+}
+
+function closeConfigModal() {
+    if (window.innerWidth <= 768) {
+        const overlay = document.getElementById('configOverlay');
+        const bottomSheet = document.getElementById('configBottomSheet');
+        if (overlay && bottomSheet) {
+            overlay.classList.remove('show');
+            bottomSheet.classList.remove('show');
+        }
+    } else {
+        if (typeof $ !== 'undefined') {
+            $('#configModal').modal('hide');
+        }
+    }
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    const closeConfigBottomSheet = document.getElementById('closeConfigBottomSheet');
+    const configOverlay = document.getElementById('configOverlay');
+
+    if (closeConfigBottomSheet) {
+        closeConfigBottomSheet.addEventListener('click', closeConfigModal);
+    }
+
+    if (configOverlay) {
+        configOverlay.addEventListener('click', closeConfigModal);
+    }
+
+    const closeRulesBottomSheet = document.getElementById('closeBottomSheet');
+    const avatarOverlay = document.getElementById('avatarOverlay');
+
+    if (closeRulesBottomSheet) {
+        closeRulesBottomSheet.addEventListener('click', closeRulesModal);
+    }
+
+    if (avatarOverlay) {
+        avatarOverlay.addEventListener('click', closeRulesModal);
+    }
+});
+
+window.onclick = function(event) {
+    const configModal = document.getElementById('configModal');
+    const rulesModal = document.getElementById('avatarModal');
+
+    if (configModal && event.target === configModal) {
+        closeConfigModal();
+    }
+    if (rulesModal && event.target === rulesModal) {
+        closeRulesModal();
+    }
+}
+
+document.addEventListener('keydown', function(event) {
+    if (event.key === 'Escape') {
+        closeConfigModal();
+        closeRulesModal();
+    }
+});

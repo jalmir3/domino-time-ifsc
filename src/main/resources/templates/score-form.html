@@ -31,7 +31,10 @@
     </div>
 </div>
 <div class="form-container">
-    <h1 class="title">Registrar Pontuação</h1>
+    <div class="title-container">
+        <h1 class="title">Registrar Pontuação</h1>
+        <i class="fas fa-info-circle info-icon" onclick="showRulesModal()"></i>
+    </div>
     <h2 class="subtitle" th:text="'Grupo: ' + ${group.name}"></h2>
     <div class="game-info">
         <div class="game-mode">
@@ -76,7 +79,9 @@
                             <input class="score-input team-a-input" type="number" name="teamAScore" value="0" min="0"
                                    required onchange="updateTotals()">
                         </td>
-                        <td class="score-cell" id="total-teamA" th:attr="data-base=${teamAScore}" th:text="${teamAScore}">0</td>
+                        <td class="score-cell" id="total-teamA" th:attr="data-base=${teamAScore}"
+                            th:text="${teamAScore}">0
+                        </td>
                     </tr>
                     <tr class="score-row">
                         <td class="score-cell">Time B</td>
@@ -87,7 +92,9 @@
                             <input class="score-input team-b-input" type="number" name="teamBScore" value="0" min="0"
                                    required onchange="updateTotals()">
                         </td>
-                        <td class="score-cell" id="total-teamB" th:attr="data-base=${teamBScore}" th:text="${teamBScore}">0</td>
+                        <td class="score-cell" id="total-teamB" th:attr="data-base=${teamBScore}"
+                            th:text="${teamBScore}">0
+                        </td>
                     </tr>
                     </tbody>
                 </table>
@@ -97,7 +104,8 @@
                     <button type="submit" class="btn btn-primary">Salvar Rodada</button>
                 </div>
             </form>
-            <form th:if="${!hasWinner}" th:action="@{'/matches/' + ${match.id} + '/cancel'}" method="post" class="cancel-form">
+            <form th:if="${!hasWinner}" th:action="@{'/matches/' + ${match.id} + '/cancel'}" method="post"
+                  class="cancel-form">
                 <div class="action-buttons">
                     <button type="submit" class="btn btn-danger"
                             onclick="return confirm('Tem certeza que deseja cancelar esta partida?')">
@@ -168,7 +176,8 @@
                                th:value="${player.id}">
                     </td>
                     <td class="score-cell total-score" th:id="'total-' + ${player.id}"
-                        th:text="${latestScores[player.id]} ?: 0">0</td>
+                        th:text="${latestScores[player.id]} ?: 0">0
+                    </td>
                 </tr>
                 </tbody>
             </table>
@@ -176,7 +185,8 @@
                 <button type="submit" class="btn btn-primary">Salvar Rodada</button>
             </div>
         </form>
-        <form th:if="${!hasWinner}" th:action="@{'/matches/' + ${match.id} + '/cancel'}" method="post" class="cancel-form">
+        <form th:if="${!hasWinner}" th:action="@{'/matches/' + ${match.id} + '/cancel'}" method="post"
+              class="cancel-form">
             <div class="action-buttons">
                 <button type="submit" class="btn btn-danger"
                         onclick="return confirm('Tem certeza que deseja cancelar esta partida?')">
@@ -210,6 +220,83 @@
         </div>
     </div>
 </div>
+<div class="modal fade avatar-modal" id="avatarModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Regras do Jogo de Dominó</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="rules-content">
+                    <h6>Como Funciona:</h6>
+                    <ul>
+                        <li>Cada jogador inicia com X peças</li>
+                        <li>O jogo começa com quem tiver a peça 6x6</li>
+                        <li>Os jogadores devem conectar peças com números iguais</li>
+                        <li>Quem ficar sem peças primeiro vence a rodada</li>
+                    </ul>
+
+                    <h6>Pontuação:</h6>
+                    <ul>
+                        <li>Individual: Cada jogador soma pontos das peças restantes dos oponentes</li>
+                        <li>Duplas: A dupla vencedora soma os pontos das peças restantes da dupla adversária</li>
+                        <li>Vitória: Primeiro a atingir a 100 pontos)</li>
+                    </ul>
+
+                    <h6>Dicas:</h6>
+                    <ul>
+                        <li>Registre a pontuação após cada rodada</li>
+                        <li>O sistema calcula automaticamente os totais</li>
+                        <li>Você pode cancelar a partida a qualquer momento</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" onclick="closeRulesModal()">Entendi</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="avatar-overlay" id="avatarOverlay"></div>
+<div class="delete-account-bottom-sheet" id="avatarBottomSheet">
+    <div class="sheet-header">
+        <h5 class="sheet-title">Regras do Jogo de Dominó</h5>
+        <button type="button" class="close-btn" id="closeBottomSheet">
+            <i class="fas fa-times"></i>
+        </button>
+    </div>
+    <div class="sheet-content">
+        <div class="rules-content">
+            <h6>Como Funciona:</h6>
+            <ul>
+                <li>Cada jogador inicia com X peças</li>
+                <li>O jogo começa com quem tiver a peça 6x6</li>
+                <li>Os jogadores devem conectar peças com números iguais</li>
+                <li>Quem ficar sem peças primeiro vence a rodada</li>
+            </ul>
+
+            <h6>Pontuação:</h6>
+            <ul>
+                <li>Individual: Cada jogador soma pontos das peças restantes dos oponentes</li>
+                <li>Duplas: A dupla vencedora soma os pontos das peças restantes da dupla adversária</li>
+                <li>Vitória: Primeiro a atingir a 100 pontos)</li>
+            </ul>
+
+            <h6>Dicas:</h6>
+            <ul>
+                <li>Registre a pontuação após cada rodada</li>
+                <li>O sistema calcula automaticamente os totais</li>
+                <li>Você pode cancelar a partida a qualquer momento</li>
+            </ul>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-primary" onclick="closeRulesModal()">Entendi</button>
+    </div>
+</div>
 <div class="footer-bar">
     Convide seus amigos e comece a marcar suas partidas de dominó agora mesmo!
 </div>
@@ -220,3 +307,4 @@
 <script th:src="@{/js/userAvatar.js}"></script>
 </body>
 </html>
+

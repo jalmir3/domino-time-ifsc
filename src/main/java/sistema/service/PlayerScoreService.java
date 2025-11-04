@@ -256,4 +256,9 @@ public class PlayerScoreService {
     public void updatePlayerNameForDeletedUser(UUID userId, String deletedPlayerName) {
         playerScoreRepository.updatePlayerNameByUserId(userId, deletedPlayerName);
     }
+
+    @Transactional
+    public void updatePlayerNameForUser(UUID userId, String nickname) {
+        playerScoreRepository.updatePlayerNameByUserId(userId, nickname);
+    }
 }

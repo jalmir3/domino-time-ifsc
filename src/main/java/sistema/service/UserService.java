@@ -99,7 +99,11 @@ public class UserService {
     }
 
     public void updateUser(User user) {
-        userRepository.save(user);
+        User existingUser = userRepository.findById(user.getId()).orElse(null);
+        if (existingUser != null) {
+            playerScoreService.updatePlayerNameForUser(user.getId(), user.getNickname());
+            userRepository.save(user);
+        }
     }
 
     public boolean validatePassword(User user, String rawPassword) {
