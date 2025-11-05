@@ -7,7 +7,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import java.time.LocalDate;
 
 @Data
-public class UserRegistrationDto {
+public class UserRegistrationDTO {
     @NotBlank(message = "Email é obrigatório")
     @Email(message = "Email inválido")
     private String email;

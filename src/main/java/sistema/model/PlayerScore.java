@@ -35,4 +35,6 @@ public class PlayerScore {
     private Integer score;
     @Column(name = "round_number")
     private Integer roundNumber;
+    @Column(name = "player_name", length = 100)
+    private String playerName;
 }

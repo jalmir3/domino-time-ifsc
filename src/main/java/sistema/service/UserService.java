@@ -6,7 +6,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import sistema.dto.UserRegistrationDto;
+import sistema.dto.UserRegistrationDTO;
 import sistema.model.User;
 import sistema.model.UserStatus;
 import sistema.repository.UserRepository;
@@ -21,8 +21,9 @@ public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final EmailService emailService;
+    private final PlayerScoreService playerScoreService; // Adicionado para atualizar o nome do jogador
 
-    public void registerUserWithActivation(UserRegistrationDto registrationDto) throws MessagingException {
+    public void registerUserWithActivation(UserRegistrationDTO registrationDto) throws MessagingException {
         if (!registrationDto.getPassword().equals(registrationDto.getConfirmPassword())) {
             throw new IllegalArgumentException("Senhas não coincidem");
         }
@@ -98,7 +99,11 @@ public class UserService {
     }
 
     public void updateUser(User user) {
-        userRepository.save(user);
+        User existingUser = userRepository.findById(user.getId()).orElse(null);
+        if (existingUser != null) {
+            playerScoreService.updatePlayerNameForUser(user.getId(), user.getNickname());
+            userRepository.save(user);
+        }
     }
 
     public boolean validatePassword(User user, String rawPassword) {
@@ -116,9 +121,12 @@ public class UserService {
         if (!passwordEncoder.matches(password, user.getPassword())) {
             throw new IllegalArgumentException("Senha incorreta");
         }
+
+        String deletedPlayerName = "deletado";
+        playerScoreService.updatePlayerNameForDeletedUser(userId, deletedPlayerName);
         user.setStatus(UserStatus.DELETED);
         user.setEmail(user.getId() + "@deleted.com");
-        user.setNickname(user.getNickname()+"(deletado)");
+        user.setNickname(user.getId() + "(deletado)");
         user.setDeletedAt(LocalDateTime.now());
         user.setAvatar(null);
         userRepository.save(user);

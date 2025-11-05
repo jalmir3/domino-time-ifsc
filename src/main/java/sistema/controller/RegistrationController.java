@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import sistema.dto.UserRegistrationDto;
+import sistema.dto.UserRegistrationDTO;
 import sistema.service.UserService;
 
 @Controller
@@ -24,12 +24,12 @@ public class RegistrationController {
 
     @GetMapping
     public String showRegistrationForm(Model model) {
-        model.addAttribute("user", new UserRegistrationDto());
+        model.addAttribute("user", new UserRegistrationDTO());
         return registration;
     }
 
     @PostMapping
-    public String registerUser(@ModelAttribute("user") @Valid UserRegistrationDto userDto,
+    public String registerUser(@ModelAttribute("user") @Valid UserRegistrationDTO userDto,
                                BindingResult result,
                                Model model) {
         if (result.hasErrors()) {

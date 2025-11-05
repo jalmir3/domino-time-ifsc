@@ -38,11 +38,12 @@
     <div class="row justify-content-center">
         <div class="col-md-10">
             <div class="card shadow">
-                <div class="card-header text-white" style="background-color: #4aa2dd;">
-                    <h3 class="mb-0">Configurar Partida</h3>
-                    <small th:text="'Grupo: ' + ${group.name}"></small>
+                <div class="title-container">
+                    <h1 class="title">Configurar Partida</h1>
+                    <i class="fas fa-info-circle info-icon" onclick="showConfigModal()"></i>
                     <i class="fas fa-sync-alt refresh-button" onclick="window.location.reload()"></i>
                 </div>
+                <h2 class="subtitle" th:text="'Grupo: ' + ${group.name}"></h2>
                 <div class="card-body">
                     <div class="alert" th:classappend="${maxPlayersReached} ? 'alert-success' : 'alert-info'">
                         <div th:if="${maxPlayersReached}">
@@ -63,14 +64,17 @@
                                     <img th:src="@{'/images/default-avatar.png'}" class="player-avatar mb-2">
                                     <h6 th:text="${player.nickname}"></h6>
                                     <small class="text-muted" th:text="${player.email}"></small>
-                                    <input type="hidden" class="team-a-input" name="teamA" th:value="${player.id}" disabled>
-                                    <input type="hidden" class="team-b-input" name="teamB" th:value="${player.id}" disabled>
+                                    <input type="hidden" class="team-a-input" name="teamA" th:value="${player.id}"
+                                           disabled>
+                                    <input type="hidden" class="team-b-input" name="teamB" th:value="${player.id}"
+                                           disabled>
                                 </div>
                             </div>
                         </div>
                     </div>
                     <hr>
-                    <form th:action="@{'/groups/' + ${group.accessCode} + '/start-configured'}" method="post" id="configForm">
+                    <form th:action="@{'/groups/' + ${group.accessCode} + '/start-configured'}" method="post"
+                          id="configForm">
                         <div class="mode-selector">
                             <h5>Modo de Jogo:</h5>
                             <div class="btn-group btn-group-toggle w-100" data-toggle="buttons">
@@ -118,6 +122,83 @@
                 </div>
             </div>
         </div>
+    </div>
+</div>
+<div class="modal fade avatar-modal" id="configModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Como Configurar a Partida</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="config-content">
+                    <h6>Passo a Passo:</h6>
+                    <ol>
+                        <li><strong>Aguardar jogadores:</strong> Espere até ter no mínimo 2 jogadores na sala</li>
+                        <li><strong>Escolher modo:</strong> Selecione Individual ou Duplas</li>
+                        <li><strong>Para Duplas:</strong> Selecione 2 jogadores para cada time</li>
+                        <li><strong>Iniciar partida:</strong> Clique no botão quando tudo estiver pronto</li>
+                    </ol>
+
+                    <h6>Modos de Jogo:</h6>
+                    <ul>
+                        <li><strong>Individual:</strong> Cada jogador por si mesmo</li>
+                        <li><strong>Duplas:</strong> 2 vs 2 - Trabalho em equipe</li>
+                    </ul>
+
+                    <h6>Dicas Importantes:</h6>
+                    <ul>
+                        <li>Certifique-se de que todos os jogadores estão presentes</li>
+                        <li>Em duplas, combine estratégias com seu parceiro</li>
+                        <li>Você pode atualizar a página para ver novos jogadores</li>
+                        <li>O botão só ficará ativo quando houver no mínimo 2 jogadores</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" onclick="closeConfigModal()">Entendi</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="avatar-overlay" id="configOverlay"></div>
+<div class="delete-account-bottom-sheet" id="configBottomSheet">
+    <div class="sheet-header">
+        <h5 class="sheet-title">Como Configurar a Partida</h5>
+        <button type="button" class="close-btn" id="closeConfigBottomSheet">
+            <i class="fas fa-times"></i>
+        </button>
+    </div>
+    <div class="sheet-content">
+        <div class="config-content">
+            <h6>Passo a Passo:</h6>
+            <ol>
+                <li><strong>Aguardar jogadores:</strong> Espere até ter no mínimo 2 jogadores na sala</li>
+                <li><strong>Escolher modo:</strong> Selecione Individual ou Duplas</li>
+                <li><strong>Para Duplas:</strong> Selecione 2 jogadores para cada time</li>
+                <li><strong>Iniciar partida:</strong> Clique no botão quando tudo estiver pronto</li>
+            </ol>
+
+            <h6>Modos de Jogo:</h6>
+            <ul>
+                <li><strong>Individual:</strong> Cada jogador por si mesmo</li>
+                <li><strong>Duplas:</strong> 2 vs 2 - Trabalho em equipe</li>
+            </ul>
+
+            <h6>Dicas Importantes:</h6>
+            <ul>
+                <li>Certifique-se de que todos os jogadores estão presentes</li>
+                <li>Em duplas, combine estratégias com seu parceiro</li>
+                <li>Você pode atualizar a página para ver novos jogadores</li>
+                <li>O botão só ficará ativo quando houver no mínimo 2 jogadores</li>
+            </ul>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-primary" onclick="closeConfigModal()">Entendi</button>
     </div>
 </div>
 <div class="footer-bar">

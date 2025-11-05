@@ -47,9 +47,16 @@ public interface PlayerScoreRepository extends JpaRepository<PlayerScore, UUID> 
     @Query("DELETE FROM PlayerScore ps WHERE ps.user.id = :userId")
     void deleteByUserId(@Param("userId") UUID userId);
 
-    @Query("SELECT ps.user.nickname as nickname, SUM(ps.totalScore) as totalScore " +
+    @Transactional
+    @Modifying
+    @Query("UPDATE PlayerScore ps SET ps.playerName = :playerName WHERE ps.user.id = :userId")
+    void updatePlayerNameByUserId(@Param("userId") UUID userId, @Param("playerName") String playerName);
+
+    @Query("SELECT ps.playerName as playerName, SUM(ps.totalScore) as totalScore " +
             "FROM PlayerScore ps " +
-            "GROUP BY ps.user.id, ps.user.nickname " +
+            "JOIN ps.user u " +
+            "WHERE ps.playerName IS NOT NULL AND u.status != 'DELETED' " +
+            "GROUP BY ps.playerName " +
             "ORDER BY totalScore DESC")
     Page<Object[]> findTop10UsersByTotalScore(Pageable pageable);
 }
