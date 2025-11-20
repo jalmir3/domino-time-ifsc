@@ -1,4 +1,4 @@
-﻿/* ===== CSS PADRÃƒO ===== */
+﻿/* ===== CSS PADRÃO ===== */
 body {
     margin: 0;
     font-family: Arial, sans-serif;
@@ -460,6 +460,76 @@ body {
     cursor: pointer;
 }
 
+/* ===== MODAIS ===== */
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 1600;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background-color: rgba(0, 0, 0, 0.5);
+    padding: 0;
+    margin: 0;
+}
+
+.modal.show {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow-y: auto;
+}
+
+.modal-backdrop {
+    z-index: 1550;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: none;
+}
+
+.modal-backdrop.show {
+    display: block;
+}
+
+.modal-dialog {
+    position: relative;
+    width: auto;
+    margin: auto;
+    max-width: 600px;
+    pointer-events: none;
+}
+
+.modal.show .modal-dialog {
+    pointer-events: auto;
+}
+
+.modal-dialog-centered {
+    display: flex;
+    align-items: center;
+    min-height: calc(100% - 1rem);
+}
+
+.modal-content {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    pointer-events: auto;
+    background-color: #fff;
+    background-clip: padding-box;
+    border: 1px solid rgba(0, 0, 0, 0.2);
+    border-radius: 0.3rem;
+    outline: 0;
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
 .avatar-modal .modal-content {
     border-radius: 12px;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
@@ -494,36 +564,65 @@ body {
     border-radius: 8px;
 }
 
-.modal {
-    z-index: 1600 !important;
-    position: fixed !important;
-    top: 0 !important;
-    left: 0 !important;
-    width: 100% !important;
-    height: 100% !important;
-    overflow-x: hidden !important;
-    overflow-y: auto !important;
+.modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem;
+    border-bottom: 1px solid #dee2e6;
+    border-top-left-radius: calc(0.3rem - 1px);
+    border-top-right-radius: calc(0.3rem - 1px);
 }
 
-.modal-backdrop {
-    z-index: 1550 !important;
-    position: fixed !important;
+.modal-header .close {
+    padding: 0;
+    background-color: transparent;
+    border: 0;
+    font-size: 1.5rem;
+    font-weight: 700;
+    line-height: 1;
+    color: #000;
+    text-shadow: 0 1px 0 #fff;
+    opacity: 0.5;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    cursor: pointer;
 }
 
-.modal-dialog {
-    margin: 80px auto;
+.modal-header .close:hover,
+.modal-header .close:focus {
+    color: #000;
+    text-decoration: none;
+    cursor: pointer;
+    opacity: 0.75;
+}
+
+.modal-title {
+    margin-bottom: 0;
+    line-height: 1.5;
+    font-size: 1.25rem;
+    font-weight: 500;
+}
+
+.modal-body {
     position: relative;
+    flex: 1 1 auto;
+    padding: 1rem;
+    overflow-y: auto;
 }
 
-.modal-dialog-centered {
-    display: flex !important;
-    align-items: center !important;
-    min-height: calc(100% - 1rem) !important;
-    margin: 0.5rem auto !important;
-}
-
-.avatar-modal .modal-dialog {
-    max-width: 600px;
+.modal-footer {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: flex-end;
+    padding: 1rem;
+    border-top: 1px solid #dee2e6;
+    border-bottom-right-radius: calc(0.3rem - 1px);
+    border-bottom-left-radius: calc(0.3rem - 1px);
 }
 
 .cropper-container {
@@ -654,7 +753,7 @@ body {
     right: 20px;
     top: 20px;
     cursor: pointer;
-    color: white;
+    color: #4aa2dd;
     transition: transform 0.3s ease;
 }
 
@@ -761,7 +860,7 @@ body {
     opacity: 1;
 }
 
-/* ===== ESTILOS PARA BOTTOM SHEETS ===== */
+/* ===== BOTTOM SHEETS ===== */
 .delete-account-bottom-sheet,
 .avatar-bottom-sheet,
 #matchDetailsBottomSheet {
@@ -830,12 +929,14 @@ body {
 .close-btn:hover {
     opacity: 0.8;
 }
+
 .sheet-content,
 .sheet-body {
     padding: 1rem;
     overflow-y: auto;
     max-height: calc(85vh - 60px);
 }
+
 .sheet-content .d-grid,
 .sheet-body .d-grid {
     margin-top: 1rem;
@@ -844,6 +945,45 @@ body {
     position: sticky;
     bottom: 0;
     background: white;
+}
+
+.info-icon {
+    color: #4aa2dd;
+    cursor: pointer;
+    font-size: 1.2rem;
+    margin-left: 10px;
+    transition: color 0.3s ease;
+}
+
+.info-icon:hover {
+    color: #357abd;
+}
+
+.title-container {
+    margin-top: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+}
+
+.rules-content h6,
+.config-content h6 {
+    color: #4aa2dd;
+    margin-top: 15px;
+    margin-bottom: 10px;
+}
+
+.rules-content ul,
+.config-content ul,
+.config-content ol {
+    padding-left: 20px;
+}
+
+.rules-content li,
+.config-content li {
+    margin-bottom: 8px;
+    line-height: 1.4;
 }
 
 /* ===== MEDIA QUERIES ===== */
@@ -856,6 +996,7 @@ body {
         display: none !important;
     }
 }
+
 @media (min-width: 577px) {
     .container {
         max-width: 1200px;
@@ -867,6 +1008,7 @@ body {
         max-width: 1000px;
     }
 }
+
 @media (max-width: 768px) {
     .config-container {
         padding: 10px;

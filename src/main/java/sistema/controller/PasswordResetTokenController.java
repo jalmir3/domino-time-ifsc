@@ -7,7 +7,7 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-import sistema.dto.NewPasswordDto;
+import sistema.dto.NewPasswordDTO;
 import sistema.service.UserService;
 
 @Controller
@@ -20,7 +20,7 @@ public class PasswordResetTokenController {
     public String showResetPasswordForm(@RequestParam("token") String token, RedirectAttributes redirectAttributes, Model model) {
         if (userService.isPasswordResetTokenValid(token)) {
             model.addAttribute("token", token);
-            model.addAttribute("password", new NewPasswordDto());
+            model.addAttribute("password", new NewPasswordDTO());
             return "reset-password";
         }
         redirectAttributes.addFlashAttribute("error", "Token inválido ou expirado. Por favor, solicite um novo link.");
@@ -28,7 +28,7 @@ public class PasswordResetTokenController {
     }
 
     @PostMapping
-    public String processResetPassword(@Valid @ModelAttribute("password") NewPasswordDto passwordDto,
+    public String processResetPassword(@Valid @ModelAttribute("password") NewPasswordDTO passwordDto,
                                        BindingResult result,
                                        @RequestParam("token") String token,
                                        Model model) {
