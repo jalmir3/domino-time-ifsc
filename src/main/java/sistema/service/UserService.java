@@ -23,7 +23,7 @@ public class UserService {
     private final EmailService emailService;
     private final PlayerScoreService playerScoreService; // Adicionado para atualizar o nome do jogador
 
-    public void registerUserWithActivation(UserRegistrationDTO registrationDto) throws MessagingException {
+    public void registerUserWithActivation(UserRegistrationDTO registrationDto) throws Exception {
         if (!registrationDto.getPassword().equals(registrationDto.getConfirmPassword())) {
             throw new IllegalArgumentException("Senhas não coincidem");
         }

@@ -46,6 +46,8 @@ public class RegistrationController {
         } catch (MessagingException e) {
             result.reject("erro.email", "Erro ao enviar e-mail de ativação");
             return registration;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
     }
 }
