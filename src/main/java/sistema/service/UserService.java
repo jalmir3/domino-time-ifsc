@@ -21,7 +21,7 @@ public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final EmailService emailService;
-    private final PlayerScoreService playerScoreService; // Adicionado para atualizar o nome do jogador
+    private final PlayerScoreService playerScoreService;
 
     public void registerUserWithActivation(UserRegistrationDTO registrationDto) throws Exception {
         if (!registrationDto.getPassword().equals(registrationDto.getConfirmPassword())) {
@@ -42,7 +42,7 @@ public class UserService {
         user.setNickname(registrationDto.getNickname());
         user.setStatus(UserStatus.INACTIVE);
         userRepository.save(user);
-        String activationLink = "http://localhost:8080/activate?token=" + activationToken;
+        String activationLink = "https://domino-time-ifsc-production.up.railway.app/activate?token=" + activationToken;
         emailService.sendActivationEmail(user.getEmail(), activationLink);
     }
 

@@ -35,7 +35,7 @@ public class PasswordResetController {
         }
         try {
             String token = userService.createPasswordResetToken(request.getEmail());
-            String resetLink = "http://localhost:8080/reset-password?token=" + token;
+            String resetLink = "https://domino-time-ifsc-production.up.railway.app/reset-password?token=" + token;
             emailService.sendPasswordResetEmail(request.getEmail(), resetLink);
             model.addAttribute("message", "Enviamos um link para redefinir sua senha para o email informado");
             return "forgot-password";
