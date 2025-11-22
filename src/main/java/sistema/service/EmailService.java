@@ -22,10 +22,18 @@ public class EmailService {
     @Value("${brevo.sender.name}")
     private String senderName;
 
-    public void sendActivationEmail(String to, String activationLink) throws Exception {
+    private TransactionalEmailsApi cachedApi = null;
 
-        TransactionalEmailsApi api = new TransactionalEmailsApi();
-        api.getApiClient().setApiKey(brevoApiKey);
+    private TransactionalEmailsApi getApiInstance() {
+        if (cachedApi == null) {
+            cachedApi = new TransactionalEmailsApi();
+            cachedApi.getApiClient().setApiKey(brevoApiKey);
+        }
+        return cachedApi;
+    }
+
+    public void sendActivationEmail(String to, String activationLink) throws Exception {
+        TransactionalEmailsApi api = getApiInstance();
 
         SendSmtpEmail email = new SendSmtpEmail()
                 .sender(new SendSmtpEmailSender()
@@ -43,9 +51,7 @@ public class EmailService {
     }
 
     public void sendPasswordResetEmail(String to, String resetLink) throws Exception {
-
-        TransactionalEmailsApi api = new TransactionalEmailsApi();
-        api.getApiClient().setApiKey(brevoApiKey);
+        TransactionalEmailsApi api = getApiInstance();
 
         SendSmtpEmail email = new SendSmtpEmail()
                 .sender(new SendSmtpEmailSender()

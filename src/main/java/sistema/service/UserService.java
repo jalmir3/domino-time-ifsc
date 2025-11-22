@@ -1,8 +1,9 @@
 package sistema.service;
 
-import jakarta.mail.MessagingException;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -23,6 +24,7 @@ public class UserService {
     private final EmailService emailService;
     private final PlayerScoreService playerScoreService;
 
+    @CacheEvict(value = "users", allEntries = true)
     public void registerUserWithActivation(UserRegistrationDTO registrationDto) throws Exception {
         if (!registrationDto.getPassword().equals(registrationDto.getConfirmPassword())) {
             throw new IllegalArgumentException("Senhas não coincidem");
@@ -46,6 +48,7 @@ public class UserService {
         emailService.sendActivationEmail(user.getEmail(), activationLink);
     }
 
+    @CacheEvict(value = "users", allEntries = true)
     public boolean activateUser(String token) {
         return userRepository.findByActivationToken(token)
                 .map(user -> {
@@ -58,6 +61,7 @@ public class UserService {
                 .orElse(false);
     }
 
+    @CacheEvict(value = "users", allEntries = true)
     public String createPasswordResetToken(String email) {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new IllegalArgumentException("Email não cadastrado"));
@@ -74,6 +78,7 @@ public class UserService {
                 .orElse(false);
     }
 
+    @CacheEvict(value = "users", allEntries = true)
     public void resetPassword(String token, String newPassword) {
         User user = userRepository.findByPasswordResetToken(token)
                 .filter(u -> u.getPasswordResetExpiry().isAfter(LocalDateTime.now()))
@@ -84,10 +89,12 @@ public class UserService {
         userRepository.save(user);
     }
 
+    @Cacheable(value = "users", key = "#email")
     public Optional<User> findByEmail(String email) {
         return userRepository.findByEmail(email);
     }
 
+    @Cacheable(value = "users", key = "#winnerId")
     public Optional<User> findById(UUID winnerId) {
         return userRepository.findById(winnerId);
     }
@@ -98,6 +105,7 @@ public class UserService {
                 .orElse(false);
     }
 
+    @CacheEvict(value = "users", allEntries = true)
     public void updateUser(User user) {
         User existingUser = userRepository.findById(user.getId()).orElse(null);
         if (existingUser != null) {
@@ -115,6 +123,7 @@ public class UserService {
     }
 
     @Transactional
+    @CacheEvict(value = "users", allEntries = true)
     public void deleteUser(UUID userId, String password) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("Usuário não encontrado"));
