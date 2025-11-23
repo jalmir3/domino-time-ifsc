@@ -1,1 +1,0 @@
-web: java -XX:+UseG1GC -Xms128m -Xmx384m -jar target/*.jar
