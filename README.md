@@ -12,4 +12,4 @@ Repositório destinado ao sistema dominó time,que será desenvolvido para o pro
 
 ## Manual do usuário
 
-Veja o manual do usuário e link de acesso em: [doc/design-patterns.md](src/main/resources/doc/Manual%20do%20Usuário.pdf)
+Veja o manual do usuário e link de acesso em: [doc/Manual do Usuário.pdf](src/main/resources/doc/Manual%20do%20Usuário.pdf)
